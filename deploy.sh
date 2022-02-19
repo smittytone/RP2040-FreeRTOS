@@ -14,7 +14,7 @@
 # GLOBALS
 timeout=30
 do_build=0
-uf2_path="./build/App/PICO_PROJECT_NAME.uf2"
+uf2_path="./build/App/FREERTOS_PROJECT.uf2"
 rpi_path="/Volumes/RPI-RP2"
 
 # FUNCTIONS
@@ -75,10 +75,17 @@ if [ ! -e "${rpi_path}" ]; then
 fi
 
 echo "RP2040 device mounted..."
+
+# Check for available app file
+if [ ! -e "${uf2_path}" ]; then
+    echo "[ERROR] Cannot file ${uf2_path}... exiting"
+    exit 1
+fi
+
 echo "Copying ${uf2_path##*/} to ${rpi_path}/${uf2_path##*/}"
 
 # Copy file
-if cp "${uf2_path}" "${rpi_path}/${uf2_path##*/}"; then
+if cp "${uf2_path}" "${rpi_path}"; then
     echo "${uf2_path##*/} copied to ${rpi_path}"
 else
     echo "[ERROR] Could not copy ${uf2_path##*/} to ${rpi_path}/${uf2_path##*/}"
