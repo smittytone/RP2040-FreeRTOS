@@ -13,14 +13,17 @@
 
 # GLOBALS
 timeout=30
+do_build=0
 uf2_path="./build/App/PICO_PROJECT_NAME.uf2"
 rpi_path="/Volumes/RPI-RP2"
 
 # FUNCTIONS
 show_help() {
     echo -e "Usage:\n"
-    echo -e "  deploy [-h] /optional/path/to/Microvisor/app/bunde.zip\n"
+    echo -e "  deploy [-b][-h] /optional/path/to/compiled/uf2/file\n"
     echo -e "Options:\n"
+    echo "  -b / --build    Build the app first. Default: use a"
+    echo "                  pre-built version of the app" 
     echo "  -h / --help     Show this help screen"
     echo
 }
@@ -31,10 +34,24 @@ for arg in "$@"; do
     if [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
         show_help
         exit 0
+    elif [[ "$check_arg" = "--build" || "$check_arg" = "-b" ]]; then
+        do_build=1
     else
         zip_path="$arg"
     fi
 done
+
+# Do we build first?
+if [[ ${do_build} -eq 1 ]]; then
+    if [[ ! -e "./build" ]]; then
+        # No build folder? Then create it
+        # and configure the build
+        cmake -S . -B build/
+    fi
+    
+    # Build the app
+    cmake --build build
+fi
 
 # Check we have what looks like a UF2
 extension="${uf2_path##*.}"
