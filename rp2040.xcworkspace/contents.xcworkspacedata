@@ -33,5 +33,8 @@
       <FileRef
          location = "group:pico_sdk_import.cmake">
       </FileRef>
+      <FileRef
+         location = "group:README.md">
+      </FileRef>
    </Group>
 </Workspace>
