@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(BUILD_NUMBER "1")
-add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
+# Comment out the following for a release
 add_compile_definitions(DEBUG=1)
 
 add_executable(FREERTOS_PROJECT
