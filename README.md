@@ -41,6 +41,10 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
 
 Workspace files are included for the Visual Studio Code and Xcode IDEs.
 
+## Credits
+
+This work was inspired by work done on [Twilio Microvisor FreeRTOS Demo code](https://github.com/twilio/twilio-microvisor-freertos), but the version of the `FreeRTOSConfig.h` file included here was derived from [work by @yunka2](https://github.com/yunkya2/pico-freertos-sample).
+
 ## Copyright and Licences
 
 Application source © 2022, Tony Smith and licensed under the terms of the [MIT Licence](./LICENSE.md).
