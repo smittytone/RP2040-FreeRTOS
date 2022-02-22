@@ -36,6 +36,10 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
 1. Connect your device.
 1. Install the app: `./deploy.sh`.
     * If you have changed the name of the project, run this as: `./deploy.sh build/App/<MY_PROJECT>.uf2`.
+    
+## IDEs
+
+Workspace files are included for the Visual Studio Code and Xcode IDEs.
 
 ## Copyright and Licences
 
