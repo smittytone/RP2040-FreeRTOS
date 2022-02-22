@@ -8,6 +8,9 @@ set(VERSION_NUMBER "1.0.0")
 set(BUILD_NUMBER "1")
 add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
 
+# Set app-side debugging ON or OFF
+set(DO_DEBUG ON)
+
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
 # Comment out this line if you have a global copy of the
 # SDK set and $PICO_SDK_PATH defined in your $PATH
@@ -17,7 +20,8 @@ set(ENV{PICO_SDK_PATH} "${CMAKE_SOURCE_DIR}/pico-sdk")
 include(pico_sdk_import.cmake)
 
 # Name the project
-project(FREERTOS_PROJECT C CXX ASM
+project(FREERTOS_PROJECT
+        LANGUAGES C CXX ASM
         VERSION ${VERSION_NUMBER}
         DESCRIPTION "FreeRTOS-based RP2040 application"
 )
@@ -53,6 +57,9 @@ target_include_directories(FreeRTOS PUBLIC
 
 # Include the application source code
 add_subdirectory(${APP_SRC_DIRECTORY})
+
+message(STATUS "VERSION: ${VERSION_NUMBER}")
+message(STATUS "LATEST BUILD: ${BUILD_NUMBER}")
 
 # Clean up
 unset(FREERTOS_CFG_DIRECTORY)
