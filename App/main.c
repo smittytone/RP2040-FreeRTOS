@@ -11,8 +11,11 @@
 /**
  * GLOBALS
  */
-volatile QueueHandle_t event_queue = NULL;
+// This is the inter-task queue
+volatile QueueHandle_t queue = NULL;
 
+// Set a delay time of exactly 500ms
+const TickType_t ms_delay = 500 / portTICK_PERIOD_MS;
 
 /**
  * FUNCTIONS
@@ -30,21 +33,20 @@ void led_task_pico(void* unused_arg) {
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     
     while (true) {
-        log_debug("PICO LED FLASH");
-        
         // Turn Pico LED on an add the LED state
         // to the FreeRTOS xQUEUE
+        log_debug("PICO LED FLASH");
         pico_led_state = 1;
         gpio_put(PICO_DEFAULT_LED_PIN, pico_led_state);
-        xQueueSendToBack(event_queue, &pico_led_state, 0);
-        vTaskDelay(50);
+        xQueueSendToBack(queue, &pico_led_state, 0);
+        vTaskDelay(ms_delay);
         
         // Turn Pico LED off an add the LED state
         // to the FreeRTOS xQUEUE
         pico_led_state = 0;
         gpio_put(PICO_DEFAULT_LED_PIN, pico_led_state);
-        xQueueSendToBack(event_queue, &pico_led_state, 0);
-        vTaskDelay(50);
+        xQueueSendToBack(queue, &pico_led_state, 0);
+        vTaskDelay(ms_delay);
     }
 }
 
@@ -64,10 +66,10 @@ void led_task_gpio(void* unused_arg) {
     
     while (true) {
         // Check for an item in the FreeRTOS xQueue
-        if (xQueueReceive(event_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
+        if (xQueueReceive(queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
-            log_debug("GPIO LED FLASH");
+            if (passed_value_buffer) log_debug("GPIO LED FLASH");
             gpio_put(GREEN_LED_PIN, passed_value_buffer == 1 ? 0 : 1);
         }
     }
@@ -108,7 +110,7 @@ int main() {
     xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 256, NULL, 1, NULL);
     
     // Set up the event queue
-    event_queue = xQueueCreate(5, sizeof(uint8_t));
+    queue = xQueueCreate(5, sizeof(uint8_t));
     
     // Log app info
     log_device_info();
