@@ -31,11 +31,12 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
 1. Enter the repo: `cd RP2040-FreeRTOS`.
 1. Install the submodules: `git submodule update --init --recursive`.
 1. Optionally, edit `CMakeLists.txt` and `/App/CMakeLists.txt` to rename the project.
-1. Configure the tools: `cmake -S . -B build/`.
-1. Build the app: `cmake --build build`.
-1. Connect your device.
+1. Optionally, manually configure the build process: `cmake -S . -B build/`.
+1. Optionally, manually build the app: `cmake --build build`.
+1. Connect your device so it’s ready for file transfer.
 1. Install the app: `./deploy.sh`.
-    * If you have changed the name of the project, run this as: `./deploy.sh build/App/<MY_PROJECT>.uf2`.
+    * To trigger a build, include the `--build` or `-b` flag: `./deploy.sh -b`.
+    * If you have changed the name of the project, run this as: `./deploy.sh -b build/App/<MY_PROJECT_NAME>.uf2`.
     
 ## IDEs
 
