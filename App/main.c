@@ -107,7 +107,7 @@ int main() {
     xTaskCreate(led_task_pico, "PICO_LED_TASK", 256, NULL, 1, NULL);
     xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 256, NULL, 1, NULL);
     
-    // Set up event queue
+    // Set up the event queue
     event_queue = xQueueCreate(5, sizeof(uint8_t));
     
     // Log app info
