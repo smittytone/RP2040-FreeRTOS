@@ -37,7 +37,13 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
 1. Install the app: `./deploy.sh`.
     * To trigger a build, include the `--build` or `-b` flag: `./deploy.sh -b`.
     * If you have changed the name of the project, run this as: `./deploy.sh -b build/App/<MY_PROJECT_NAME>.uf2`.
-    
+
+## The App
+
+The app code included provides a simple flip-flop using an on-board LED and an LED wired between GPIO 20 and GND. The board LED flashes every 500ms under one task. When its state changes, a message containing its state is added to a FreeRTOS inter-task xQueue. A second task checks for an enqueued message: if one is present, it reads the message and sets the LED it controls — the GPIO LED — accordingly to the inverse of the board LED’s state.
+
+The code demonstrates a basic FreeRTOS setup, but you can replace it entirely with your own code if you’re using this repo’s contents as a template for your own projects.
+
 ## IDEs
 
 Workspace files are included for the Visual Studio Code and Xcode IDEs.
