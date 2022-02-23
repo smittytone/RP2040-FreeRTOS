@@ -18,7 +18,7 @@ set(DO_DEBUG ON)
 message("Building ${APP_NAME} ${VERSION_NUMBER} (${BUILD_NUMBER})")
 
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
-# Comment out this line if you have a global copy of the
+# Comment out the set() if you have a global copy of the
 # SDK set and $PICO_SDK_PATH defined in your $PATH
 set(ENV{PICO_SDK_PATH} "${CMAKE_SOURCE_DIR}/pico-sdk")
 
