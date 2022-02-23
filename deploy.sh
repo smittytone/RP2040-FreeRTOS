@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 #
-# deploy
-#
 # Deploy RP2040 application code
 #
 # @copyright 2022, Tony Smith @smittytone
