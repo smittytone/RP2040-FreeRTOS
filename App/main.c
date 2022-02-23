@@ -3,7 +3,7 @@
  * 
  * @copyright 2022, Tony Smith (@smittytone)
  * @version   1.0.0
- * @license   MIT
+ * @licence   MIT
  *
  */
 #include "main.h"
@@ -119,7 +119,7 @@ int main() {
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();
     
-    // We shoild never get here, but just in case...
+    // We should never get here, but just in case...
     while(true) {
         // NOP
     };
