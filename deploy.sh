@@ -78,7 +78,7 @@ echo "RP2040 device mounted..."
 
 # Check for available app file
 if [ ! -e "${uf2_path}" ]; then
-    echo "[ERROR] Cannot file ${uf2_path}... exiting"
+    echo "[ERROR] Cannot find file ${uf2_path}... exiting"
     exit 1
 fi
 
