@@ -10,19 +10,19 @@ else()
 endif()
 
 # Include app source code file(s)
-add_executable(${APP_NAME}
+add_executable(${PROJECT_NAME}
     main.c
 )
 
 # Link to built libraries
-target_link_libraries(${APP_NAME} LINK_PUBLIC
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC
     pico_stdlib
     hardware_gpio
     FreeRTOS)
 
 # Enable/disable STDIO via USB and UART
-pico_enable_stdio_usb(${APP_NAME} 1)
-pico_enable_stdio_uart(${APP_NAME} 1)
+pico_enable_stdio_usb(${PROJECT_NAME} 1)
+pico_enable_stdio_uart(${PROJECT_NAME} 1)
 
 # Enable extra build products
-pico_add_extra_outputs(${APP_NAME})
+pico_add_extra_outputs(${PROJECT_NAME})

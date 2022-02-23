@@ -50,6 +50,14 @@ void log_debug(const char* msg) {
 
 
 /**
+ * @brief Show basic device info.
+ */
+void log_device_info(void) {
+    printf("App: %s %s\n Build: %i\n", APP_NAME, APP_VERSION, BUILD_NUM);
+}
+
+
+/**
  * RUNTIME START
  */
 int main() {
@@ -59,6 +67,9 @@ int main() {
     // Set up two tasks
     xTaskCreate(led_task_pico, "PICO_LED_TASK", 256, NULL, 1, NULL);
     xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 256, NULL, 1, NULL);
+    
+    // Log app info
+    log_device_info();
     
     // Start the FreeRTOS scheduler
     vTaskStartScheduler();

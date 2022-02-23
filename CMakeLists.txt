@@ -1,21 +1,20 @@
 cmake_minimum_required(VERSION 3.14)
 
-# Set the app name
-set(APP_NAME "FREERTOS_PROJECT")
-
-# Set the version number
+# Set project data
+set(PROJECT_NAME "FREERTOS_PROJECT")
 set(VERSION_NUMBER "1.0.0")
-
-# Set the build number
-# TODO Script to increment this with each build
 set(BUILD_NUMBER "1")
+
+# Make project data accessible to compiler
+add_compile_definitions(APP_NAME="${PROJECT_NAME}")
+add_compile_definitions(APP_VERSION="${VERSION_NUMBER}")
 add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
 
 # Set app-side debugging ON or OFF
 set(DO_DEBUG ON)
 
 # Introduction...
-message("Building ${APP_NAME} ${VERSION_NUMBER} (${BUILD_NUMBER})")
+message("Building ${PROJECT_NAME} ${VERSION_NUMBER} (${BUILD_NUMBER})")
 
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
 # Comment out the set() if you have a global copy of the
@@ -26,7 +25,7 @@ set(ENV{PICO_SDK_PATH} "${CMAKE_SOURCE_DIR}/pico-sdk")
 include(pico_sdk_import.cmake)
 
 # Name the project
-project(${APP_NAME}
+project(${PROJECT_NAME}
         LANGUAGES C CXX ASM
         VERSION ${VERSION_NUMBER}
         DESCRIPTION "FreeRTOS-based RP2040 application"
