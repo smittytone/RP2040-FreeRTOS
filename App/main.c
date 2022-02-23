@@ -1,36 +1,75 @@
+/**
+ *
+ * @copyright 2022, Tony Smith (@smittytone)
+ * @version   1.0.0
+ * @license   MIT
+ *
+ */
 #include "main.h"
 
+
+/**
+ * GLOBALS
+ */
+volatile QueueHandle_t event_queue = NULL;
+
+
+/**
+ * FUNCTIONS
+ */
 
 /**
  * @brief Repeatedly flash the Pico's built-in LED.
  */
 void led_task_pico(void* unused_arg) {
+    // Store the Pico LED state
+    uint8_t pico_led_state = 0;
+    
+    // Configure the Pico's on-board LED
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     
     while (true) {
         log_debug("PICO LED FLASH");
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);
+        
+        // Turn Pico LED on an add the LED state
+        // to the FreeRTOS xQUEUE
+        pico_led_state = 1;
+        gpio_put(PICO_DEFAULT_LED_PIN, pico_led_state);
+        xQueueSendToBack(event_queue, &pico_led_state, 0);
         vTaskDelay(50);
-        gpio_put(PICO_DEFAULT_LED_PIN, 0);
+        
+        // Turn Pico LED off an add the LED state
+        // to the FreeRTOS xQUEUE
+        pico_led_state = 0;
+        gpio_put(PICO_DEFAULT_LED_PIN, pico_led_state);
+        xQueueSendToBack(event_queue, &pico_led_state, 0);
         vTaskDelay(50);
     }
 }
 
 
 /**
- * @brief Repeatedly flash an LED connected to GPIO pin 20.
+ * @brief Repeatedly flash an LED connected to GPIO pin 20
+ *        based on the value passed via the inter-task queue
  */
 void led_task_gpio(void* unused_arg) {
+    // This variable will take a copy of the value
+    // added to the FreeRTOS xQueue
+    uint8_t passed_value_buffer = 0;
+    
+    // Configure the GPIO LED
     gpio_init(GREEN_LED_PIN);
     gpio_set_dir(GREEN_LED_PIN, GPIO_OUT);
     
     while (true) {
-        log_debug("GPIO LED FLASH");
-        gpio_put(GREEN_LED_PIN, 0);
-        vTaskDelay(50);
-        gpio_put(GREEN_LED_PIN, 1);
-        vTaskDelay(50);
+        // Check for an item in the FreeRTOS xQueue
+        if (xQueueReceive(event_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
+            // Received a value so flash the GPIO LED accordingly
+            // (NOT the sent value)
+            log_debug("GPIO LED FLASH");
+            gpio_put(GREEN_LED_PIN, passed_value_buffer == 1 ? 0 : 1);
+        }
     }
 }
 
@@ -67,6 +106,9 @@ int main() {
     // Set up two tasks
     xTaskCreate(led_task_pico, "PICO_LED_TASK", 256, NULL, 1, NULL);
     xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 256, NULL, 1, NULL);
+    
+    // Set up event queue
+    event_queue = xQueueCreate(5, sizeof(uint8_t));
     
     // Log app info
     log_device_info();

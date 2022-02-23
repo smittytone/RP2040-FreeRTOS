@@ -1,3 +1,10 @@
+/**
+ *
+ * @copyright 2022, Tony Smith (@smittytone)
+ * @version   1.0.0
+ * @license   MIT
+ *
+ */
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
@@ -5,6 +12,7 @@
 // FreeRTOS
 #include <FreeRTOS.h>
 #include <task.h>
+#include <queue.h>
 // C
 #include <stdbool.h>
 #include <stdlib.h>
