@@ -107,11 +107,11 @@ int main() {
     stdio_usb_init();
     
     // Set up two tasks
-    xTaskCreate(led_task_pico, "PICO_LED_TASK", 256, NULL, 1, NULL);
-    xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 256, NULL, 1, NULL);
+    xTaskCreate(led_task_pico, "PICO_LED_TASK", 128, NULL, 1, NULL);
+    xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 128, NULL, 1, NULL);
     
     // Set up the event queue
-    queue = xQueueCreate(5, sizeof(uint8_t));
+    queue = xQueueCreate(4, sizeof(uint8_t));
     
     // Log app info
     log_device_info();
