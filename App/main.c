@@ -62,8 +62,8 @@ void led_task_gpio(void* unused_arg) {
     uint8_t passed_value_buffer = 0;
     
     // Configure the GPIO LED
-    gpio_init(GREEN_LED_PIN);
-    gpio_set_dir(GREEN_LED_PIN, GPIO_OUT);
+    gpio_init(RED_LED_PIN);
+    gpio_set_dir(RED_LED_PIN, GPIO_OUT);
     
     while (true) {
         // Check for an item in the FreeRTOS xQueue
@@ -71,7 +71,7 @@ void led_task_gpio(void* unused_arg) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
             if (passed_value_buffer) log_debug("GPIO LED FLASH");
-            gpio_put(GREEN_LED_PIN, passed_value_buffer == 1 ? 0 : 1);
+            gpio_put(RED_LED_PIN, passed_value_buffer == 1 ? 0 : 1);
         }
     }
 }

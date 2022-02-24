@@ -34,7 +34,7 @@ extern "C" {
 /**
  * CONSTANTS
  */
-#define     GREEN_LED_PIN           20
+#define         RED_LED_PIN           20
 
 
 /**
