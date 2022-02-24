@@ -21,7 +21,14 @@ message("Building ${PROJECT_NAME} ${VERSION_NUMBER} (${BUILD_NUMBER})")
 # SDK set and $PICO_SDK_PATH defined in your $PATH
 set(ENV{PICO_SDK_PATH} "${CMAKE_SOURCE_DIR}/pico-sdk")
 
-# Inlcude the Pico SDK
+# Set flags and directory variables
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DTSDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DTSDEBUG")
+set(FREERTOS_CFG_DIRECTORY "${CMAKE_SOURCE_DIR}/Config")
+set(FREERTOS_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel")
+set(APP_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App")
+
+# Include the Pico SDK
 include(pico_sdk_import.cmake)
 
 # Name the project
@@ -33,13 +40,6 @@ project(${PROJECT_NAME}
 
 # Initialise the Pico SDK
 pico_sdk_init()
-
-# Set flags and directory variables
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DTSDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DTSDEBUG")
-set(FREERTOS_CFG_DIRECTORY "${CMAKE_SOURCE_DIR}/Config")
-set(FREERTOS_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel")
-set(APP_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App")
 
 # Add FreeRTOS as a library
 add_library(FreeRTOS STATIC
