@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.0.0
+ * @version   1.0.1
  * @licence   MIT
  *
  */
@@ -17,6 +17,12 @@ volatile QueueHandle_t queue = NULL;
 
 // Set a delay time of exactly 500ms
 const TickType_t ms_delay = 500 / portTICK_PERIOD_MS;
+
+// FROM 1.0.1
+// Record references to the tasks
+TaskHandle_t gpio_task_handle = NULL;
+TaskHandle_t pico_task_handle = NULL;
+
 
 /**
  * FUNCTIONS
@@ -107,8 +113,10 @@ int main() {
     stdio_usb_init();
     
     // Set up two tasks
-    xTaskCreate(led_task_pico, "PICO_LED_TASK", 128, NULL, 1, NULL);
-    xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 128, NULL, 1, NULL);
+    // FROM 1.0.1: store handles referencing the tasks; get return values
+    // NOTE Arg 3 is the stack depth -- in words, not bytes
+    BaseType_t pico_status = xTaskCreate(led_task_pico, "PICO_LED_TASK", 128, NULL, 1, &pico_task_handle);
+    BaseType_t gpio_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 128, NULL, 1, &gpio_task_handle);
     
     // Set up the event queue
     queue = xQueueCreate(4, sizeof(uint8_t));
@@ -117,7 +125,10 @@ int main() {
     log_device_info();
     
     // Start the FreeRTOS scheduler
-    vTaskStartScheduler();
+    // FROM 1.0.1: Only proceed with valid tasks
+    if (pico_status == pdPASS || gpio_status == pdPASS) {
+        vTaskStartScheduler();
+    }
     
     // We should never get here, but just in case...
     while(true) {

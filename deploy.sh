@@ -4,7 +4,7 @@
 # Deploy RP2040 application code
 #
 # @copyright 2022, Tony Smith @smittytone
-# @version   1.0.0
+# @version   1.0.1
 # @license   MIT
 #
 
