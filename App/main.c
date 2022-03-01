@@ -9,7 +9,7 @@
 #include "main.h"
 
 
-/**
+/*
  * GLOBALS
  */
 // This is the inter-task queue
@@ -18,13 +18,12 @@ volatile QueueHandle_t queue = NULL;
 // Set a delay time of exactly 500ms
 const TickType_t ms_delay = 500 / portTICK_PERIOD_MS;
 
-// FROM 1.0.1
-// Record references to the tasks
+// FROM 1.0.1 Record references to the tasks
 TaskHandle_t gpio_task_handle = NULL;
 TaskHandle_t pico_task_handle = NULL;
 
 
-/**
+/*
  * FUNCTIONS
  */
 
@@ -105,7 +104,7 @@ void log_device_info(void) {
 }
 
 
-/**
+/*
  * RUNTIME START
  */
 int main() {
@@ -113,10 +112,20 @@ int main() {
     stdio_usb_init();
     
     // Set up two tasks
-    // FROM 1.0.1: store handles referencing the tasks; get return values
+    // FROM 1.0.1 Store handles referencing the tasks; get return values
     // NOTE Arg 3 is the stack depth -- in words, not bytes
-    BaseType_t pico_status = xTaskCreate(led_task_pico, "PICO_LED_TASK", 128, NULL, 1, &pico_task_handle);
-    BaseType_t gpio_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 128, NULL, 1, &gpio_task_handle);
+    BaseType_t pico_status = xTaskCreate(led_task_pico, 
+                                         "PICO_LED_TASK", 
+                                         128, 
+                                         NULL, 
+                                         1, 
+                                         &pico_task_handle);
+    BaseType_t gpio_status = xTaskCreate(led_task_gpio, 
+                                         "GPIO_LED_TASK", 
+                                         128, 
+                                         NULL, 
+                                         1, 
+                                         &gpio_task_handle);
     
     // Set up the event queue
     queue = xQueueCreate(4, sizeof(uint8_t));
