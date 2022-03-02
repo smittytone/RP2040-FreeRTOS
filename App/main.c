@@ -59,7 +59,7 @@ void led_task_pico(void* unused_arg) {
 
 /**
  * @brief Repeatedly flash an LED connected to GPIO pin 20
- *        based on the value passed via the inter-task queue
+ *        based on the value passed via the inter-task queue.
  */
 void led_task_gpio(void* unused_arg) {
     // This variable will take a copy of the value
@@ -91,7 +91,9 @@ void log_debug(const char* msg) {
     uint msg_length = 9 + strlen(msg);
     char* sprintf_buffer = malloc(msg_length);
     sprintf(sprintf_buffer, "[DEBUG] %s\n", msg);
+    #ifdef DEBUG
     printf("%s", sprintf_buffer);
+    #endif
     free(sprintf_buffer);
 }
 
@@ -109,7 +111,9 @@ void log_device_info(void) {
  */
 int main() {
     // Enable STDIO
+    #ifdef DEBUG
     stdio_usb_init();
+    #endif
     
     // Set up two tasks
     // FROM 1.0.1 Store handles referencing the tasks; get return values
