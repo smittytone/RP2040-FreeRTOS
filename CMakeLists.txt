@@ -28,7 +28,7 @@ set(FREERTOS_CFG_DIRECTORY "${CMAKE_SOURCE_DIR}/Config")
 set(FREERTOS_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel")
 
 # Use the next line to specify the app source code
-set(APP_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App")
+set(APP_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Schedules")
 
 # Include the Pico SDK
 include(pico_sdk_import.cmake)
