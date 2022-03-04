@@ -45,7 +45,7 @@ bool MCP9808::begin() {
     const uint16_t mid_value = (mid_data[0] << 8) | mid_data[1];
     const uint16_t did_value = (did_data[0] << 8) | did_data[1];
 
-    // Returns True if the device is initialized, False otherwise.
+    // Returns True if the device is initialised, False otherwise.
     return (mid_value == 0x0054 && did_value == 0x0400);
 }
 

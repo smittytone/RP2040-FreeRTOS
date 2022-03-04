@@ -77,13 +77,14 @@ void led_set(bool state) {
  * @brief Set up I2C and the devices that use it.
  */
 void setup_i2c() {
-    // Initialize the I2C bus for the display and sensor
+    // Initialise the I2C bus for the display and sensor
     I2C::setup();
 
-    // Initialize the display
+    // Initialise the display
     display = HT16K33_Segment();
     display.init();
     
+    // Initialise the sensor
     sensor = MCP9808();
 }
 
@@ -135,7 +136,8 @@ void led_task_pico(void* unused_arg) {
             if (count > 9998) count = 0;
         }
         
-        // Yield
+        // Yield -- uncomment the next line to enable,
+        // see BLOG POST
         //vTaskDelay(0);
     }
 }
@@ -163,7 +165,8 @@ void led_task_gpio(void* unused_arg) {
             gpio_put(RED_LED_PIN, passed_value_buffer == 1 ? 0 : 1);
         }
         
-        // Yield
+        // Yield -- uncomment the next line to enable,
+        // see BLOG POST
         //vTaskDelay(0);
     }
 }
@@ -276,9 +279,9 @@ int main() {
     display.set_brightness(1);
     
     // Set up two tasks
-    xTaskCreate(led_task_pico, "PICO_LED_TASK", 128, NULL, 1, NULL);
-    xTaskCreate(led_task_gpio, "GPIO_LED_TASK", 128, NULL, 1, NULL);
-    xTaskCreate(sensor_read_task, "SENSOR_TASK", 64, NULL, 2, NULL);
+    xTaskCreate(led_task_pico, "PICO_LED_TASK",  128, NULL, 1, NULL);
+    xTaskCreate(led_task_gpio, "GPIO_LED_TASK",  128, NULL, 1, NULL);
+    xTaskCreate(sensor_read_task, "SENSOR_TASK", 128, NULL, 1, NULL);
     
     // Set up the event queue
     queue = xQueueCreate(4, sizeof(uint8_t));

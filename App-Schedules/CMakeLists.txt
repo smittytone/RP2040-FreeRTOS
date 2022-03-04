@@ -21,7 +21,6 @@ add_executable(${PROJECT_NAME}
 # Link to built libraries
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC
     pico_stdlib
-    hardware_gpio
     hardware_i2c
     FreeRTOS)
 
