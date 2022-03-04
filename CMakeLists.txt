@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.14)
 
 # Set project data
-set(PROJECT_NAME "FREERTOS_PROJECT")
-set(VERSION_NUMBER "1.0.2")
+set(PROJECT_NAME "RP2040_FREERTOS_PROJECT")
 set(BUILD_NUMBER "1")
 
-# Make project data accessible to compiler
-add_compile_definitions(APP_NAME="${PROJECT_NAME}")
-add_compile_definitions(APP_VERSION="${VERSION_NUMBER}")
-add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
+# Set app name(s) and version(s)
+set(APP_1_NAME "TEMPLATE")
+set(APP_1_VERSION_NUMBER "1.1.0")
+
+set(APP_2_NAME "SCHEDULING_DEMO")
+set(APP_2_VERSION_NUMBER "1.1.0")
 
 # Set app-side debugging ON or OFF
 set(DO_DEBUG ON)
@@ -27,8 +28,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DTSDEBUG")
 set(FREERTOS_CFG_DIRECTORY "${CMAKE_SOURCE_DIR}/Config")
 set(FREERTOS_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel")
 
-# Use the next line to specify the app source code
-set(APP_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Schedules")
+# Specify the app(s) source code
+set(APP_1_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Template")
+set(APP_2_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Scheduling")
 
 # Include the Pico SDK
 include(pico_sdk_import.cmake)
@@ -36,8 +38,7 @@ include(pico_sdk_import.cmake)
 # Name the project
 project(${PROJECT_NAME}
         LANGUAGES C CXX ASM
-        VERSION ${VERSION_NUMBER}
-        DESCRIPTION "FreeRTOS-based RP2040 application"
+        DESCRIPTION "FreeRTOS-based RP2040 applications"
 )
 
 # Initialise the Pico SDK
@@ -62,8 +63,9 @@ target_include_directories(FreeRTOS PUBLIC
     ${FREERTOS_SRC_DIRECTORY}/portable/GCC/ARM_CM0
 )
 
-# Include the application source code
-add_subdirectory(${APP_SRC_DIRECTORY})
+# Include the apps' source code
+add_subdirectory(${APP_1_SRC_DIRECTORY})
+add_subdirectory(${APP_2_SRC_DIRECTORY})
 
 # Clean up
 unset(FREERTOS_CFG_DIRECTORY)
