@@ -25,9 +25,8 @@
 #include <iomanip>
 #include <algorithm>
 // Pico SDK
-#include "pico/stdlib.h"
+#include "pico/stdlib.h"            // Includes `hardware_gpio.h`
 #include "pico/binary_info.h"
-#include "hardware/i2c.h"
 // App
 #include "i2c_utils.h"
 #include "ht16k33.h"
