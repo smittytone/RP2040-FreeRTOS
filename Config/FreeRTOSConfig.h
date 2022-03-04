@@ -53,8 +53,11 @@
 #define configUSE_NEWLIB_REENTRANT              0
 #define configENABLE_BACKWARD_COMPATIBILITY     0
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
+
 #define configSTACK_DEPTH_TYPE                  uint16_t
-#define configMESSAGE_BUFFER_LENGTH_TYPE        size_t
+#define configMESSAGE_BUFFER_LENGTH_TYPE        size_t      // Defaults to size_t for backward compatibility,
+                                                            // but can be changed if lengths will always be less
+                                                            // than the number of bytes in a size_t.
 
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         0
