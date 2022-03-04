@@ -104,9 +104,10 @@ void led_task_pico(void* unused_arg) {
     bool state = true;
     TickType_t then = 0;
     
-    // Configure the Pico's on-board LED
-    gpio_init(PICO_DEFAULT_LED_PIN);
-    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+    // Log app info
+    #ifdef DEBUG
+    log_device_info();
+    #endif
     
     // Start the task loop
     while (true) {
@@ -251,7 +252,7 @@ void log_debug(const char* msg) {
  * @brief Show basic device info.
  */
 void log_device_info(void) {
-    printf("App: %s %s\n Build: %i\n", APP_NAME, APP_VERSION, BUILD_NUM);
+    printf("App: %s %s\nBuild: %i\n", APP_NAME, APP_VERSION, BUILD_NUM);
 }
 
 
@@ -259,8 +260,8 @@ void log_device_info(void) {
  * @brief Umbrella hardware setup routine.
  */
 void setup() {
-    setup_led();
     setup_i2c();
+    setup_led();
 }
 
 
@@ -272,6 +273,8 @@ int main() {
     // DEBUG
     #ifdef DEBUG
     stdio_init_all();
+    // Pause to allow the USB path to initialize
+    sleep_ms(2000);
     #endif
     
     // Set up the hardware
@@ -279,18 +282,27 @@ int main() {
     display.set_brightness(1);
     
     // Set up two tasks
-    xTaskCreate(led_task_pico, "PICO_LED_TASK",  128, NULL, 1, NULL);
-    xTaskCreate(led_task_gpio, "GPIO_LED_TASK",  128, NULL, 1, NULL);
-    xTaskCreate(sensor_read_task, "SENSOR_TASK", 128, NULL, 1, NULL);
+    BaseType_t pico_status = xTaskCreate(led_task_pico, "PICO_LED_TASK",  128, NULL, 1, NULL);
+    BaseType_t gpio_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK",  128, NULL, 1, NULL);
+    BaseType_t sens_status = xTaskCreate(sensor_read_task, "SENSOR_TASK", 128, NULL, 1, NULL);
     
     // Set up the event queue
     queue = xQueueCreate(4, sizeof(uint8_t));
     
-    // Log app info
-    log_device_info();
-    
-    // Start the FreeRTOS scheduler
-    vTaskStartScheduler();
+    // Start the FreeRTOS scheduler if any of the tasks are good
+    if (pico_status == pdPASS || gpio_status == pdPASS || sens_status == pdPASS) {
+        vTaskStartScheduler();
+    } else {
+        // Flash board LED 5 times
+        uint8_t count = 5;
+        while (count > 0) {
+            led_on();
+            sleep_ms(100);
+            led_off();
+            sleep_ms(100);
+            count--;
+        }
+    }
     
     // We should never get here, but just in case...
     while(true) {
