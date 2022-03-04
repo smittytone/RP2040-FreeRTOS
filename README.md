@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.0.2
+# RP2040-FreeRTOS Template 1.1.0
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -8,7 +8,9 @@ More details [in this blog post](https://blog.smittytone.net/2022/02/24/how-to-u
 
 ```
 /RP2040-FreeRTOS
-|___/App                    // Application source code
+|___/App-Template           // Application 1 source code
+    |___CMakeLists.txt      // Application-level CMake config file
+|___/App-Scheduling         // Application 2 source code
     |___CMakeLists.txt      // Application-level CMake config file
 |___/Config
     |___FreeRTOSConfig.h    // FreeRTOS project config file
@@ -32,21 +34,33 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
 1. Clone the repo: `git clone https://github.com/smittytone/RP2040-FreeRTOS`.
 1. Enter the repo: `cd RP2040-FreeRTOS`.
 1. Install the submodules: `git submodule update --init --recursive`.
-1. Optionally, edit `CMakeLists.txt` and `/App/CMakeLists.txt` to rename the project.
+1. Optionally, edit `CMakeLists.txt` and `/<Application>/CMakeLists.txt` to rename the project.
 1. Optionally, manually configure the build process: `cmake -S . -B build/`.
 1. Optionally, manually build the app: `cmake --build build`.
 1. Connect your device so it’s ready for file transfer.
 1. Install the app: `./deploy.sh`.
     * To trigger a build, include the `--build` or `-b` flag: `./deploy.sh -b`.
-    * If you have changed the name of the project, run this as: `./deploy.sh -b build/App/<MY_PROJECT_NAME>.uf2`.
+    * Pass the app you wish to deplopy:
+        * `./deploy.sh build/App-Template/TEMPLATE.uf2`.
+        * `./deploy.sh build/App-Scheduling/SCHEDULING_DEMO.uf2`.
 
-## The App
+## The Apps
 
-The app code included provides a simple flip-flop using an on-board LED and an LED wired between GPIO 20 and GND. The board LED flashes every 500ms under one task. When its state changes, a message containing its state is added to a FreeRTOS inter-task xQueue. A second task checks for an enqueued message: if one is present, it reads the message and sets the LED it controls — the GPIO LED — accordingly to the inverse of the board LED’s state.
+This repo includes a number of deployable apps. The project builds them all, sequentially. Exclude apps from the build process by commenting out their `add_subdirectory()` lines in the top-level `CMakeLists.txt`.
+
+### App One: Template
+
+This app provides a simple flip-flop using an on-board LED and an LED wired between GPIO 20 and GND. The board LED flashes every 500ms under one task. When its state changes, a message containing its state is added to a FreeRTOS inter-task xQueue. A second task checks for an enqueued message: if one is present, it reads the message and sets the LED it controls — the GPIO LED — accordingly to the inverse of the board LED’s state.
 
 ![Circuit layout](./images/plus.png)
 
 The code demonstrates a basic FreeRTOS setup, but you can replace it entirely with your own code if you’re using this repo’s contents as a template for your own projects.
+
+### App Two: Scheduling
+
+This app builds on the first by adding an MCP9808 temperature sensor and an HT16K33-based LED display. It is used by this BLOG POST.
+
+![Circuit layout](./images/scheduler.png)
 
 ## IDEs
 
