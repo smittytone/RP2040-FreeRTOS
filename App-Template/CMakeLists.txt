@@ -9,24 +9,24 @@ else()
     message(STATUS "App-side debugging disabled")
 endif()
 
+# Make project data accessible to compiler
+add_compile_definitions(APP_NAME="${APP_1_NAME}")
+add_compile_definitions(APP_VERSION="${APP_1_VERSION_NUMBER}")
+add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
+
 # Include app source code file(s)
-add_executable(${PROJECT_NAME}
-    main.cpp
-    ht16k33.cpp
-    i2c_utils.cpp
-    mcp9808.cpp
-    utils.cpp
+add_executable(${APP_1_NAME}
+    ${APP_1_SRC_DIRECTORY}/main.c
 )
 
 # Link to built libraries
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC
+target_link_libraries(${APP_1_NAME} LINK_PUBLIC
     pico_stdlib
-    hardware_i2c
     FreeRTOS)
 
 # Enable/disable STDIO via USB and UART
-pico_enable_stdio_usb(${PROJECT_NAME} 1)
-pico_enable_stdio_uart(${PROJECT_NAME} 1)
+pico_enable_stdio_usb(${APP_1_NAME} 1)
+pico_enable_stdio_uart(${APP_1_NAME} 0)
 
 # Enable extra build products
-pico_add_extra_outputs(${PROJECT_NAME})
+pico_add_extra_outputs(${APP_1_NAME})
