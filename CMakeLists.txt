@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 # Set project data
 set(PROJECT_NAME "FREERTOS_PROJECT")
-set(VERSION_NUMBER "1.0.1")
+set(VERSION_NUMBER "1.0.2")
 set(BUILD_NUMBER "1")
 
 # Make project data accessible to compiler

@@ -17,12 +17,11 @@ add_executable(${PROJECT_NAME}
 # Link to built libraries
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC
     pico_stdlib
-    hardware_gpio
     FreeRTOS)
 
 # Enable/disable STDIO via USB and UART
 pico_enable_stdio_usb(${PROJECT_NAME} 1)
-pico_enable_stdio_uart(${PROJECT_NAME} 1)
+pico_enable_stdio_uart(${PROJECT_NAME} 0)
 
 # Enable extra build products
 pico_add_extra_outputs(${PROJECT_NAME})

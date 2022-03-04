@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.0.1
+ * @version   1.0.2
  * @license   MIT
  *
  */
@@ -21,9 +21,8 @@
 #include <string.h>
 #include <time.h>
 // Pico SDK
-#include "pico/stdlib.h"
+#include "pico/stdlib.h"            // Includes `hardware_gpio.h`
 #include "pico/binary_info.h"
-#include "hardware/gpio.h"
 
 
 #ifdef __cplusplus

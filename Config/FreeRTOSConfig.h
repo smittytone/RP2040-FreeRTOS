@@ -37,7 +37,7 @@
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
 #define configUSE_TICKLESS_IDLE                 0
 #define configCPU_CLOCK_HZ                      133000000   // 133MHz for RP2040
-#define configTICK_RATE_HZ                      100         // FreeRTOS beats per second
+#define configTICK_RATE_HZ                      1000        // FreeRTOS beats per second
 #define configMAX_PRIORITIES                    5           // Max number of priority values (0-24)
 #define configMINIMAL_STACK_SIZE                128
 #define configMAX_TASK_NAME_LEN                 16
@@ -53,8 +53,11 @@
 #define configUSE_NEWLIB_REENTRANT              0
 #define configENABLE_BACKWARD_COMPATIBILITY     0
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 5
+
 #define configSTACK_DEPTH_TYPE                  uint16_t
-#define configMESSAGE_BUFFER_LENGTH_TYPE        size_t
+#define configMESSAGE_BUFFER_LENGTH_TYPE        size_t      // Defaults to size_t for backward compatibility,
+                                                            // but can be changed if lengths will always be less
+                                                            // than the number of bytes in a size_t.
 
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         0
