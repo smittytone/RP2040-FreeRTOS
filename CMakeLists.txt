@@ -11,11 +11,12 @@ set(APP_1_VERSION_NUMBER "1.1.0")
 set(APP_2_NAME "SCHEDULING_DEMO")
 set(APP_2_VERSION_NUMBER "1.1.0")
 
+# Specify the app(s) source code
+set(APP_1_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Template")
+set(APP_2_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Scheduling")
+
 # Set app-side debugging ON or OFF
 set(DO_DEBUG ON)
-
-# Introduction...
-message("Building ${PROJECT_NAME} ${VERSION_NUMBER} (${BUILD_NUMBER})")
 
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
 # Comment out the set() if you have a global copy of the
@@ -27,10 +28,6 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DTSDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DTSDEBUG")
 set(FREERTOS_CFG_DIRECTORY "${CMAKE_SOURCE_DIR}/Config")
 set(FREERTOS_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel")
-
-# Specify the app(s) source code
-set(APP_1_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Template")
-set(APP_2_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Scheduling")
 
 # Include the Pico SDK
 include(pico_sdk_import.cmake)
