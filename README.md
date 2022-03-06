@@ -8,9 +8,9 @@ More details [in this blog post](https://blog.smittytone.net/2022/02/24/how-to-u
 
 ```
 /RP2040-FreeRTOS
-|___/App-Template           // Application 1 source code
+|___/App-Template           // Application 1 (FreeRTOS template) source code
     |___CMakeLists.txt      // Application-level CMake config file
-|___/App-Scheduling         // Application 2 source code
+|___/App-Scheduling         // Application 2 (scheduling demo) source code
     |___CMakeLists.txt      // Application-level CMake config file
 |___/Config
     |___FreeRTOSConfig.h    // FreeRTOS project config file
