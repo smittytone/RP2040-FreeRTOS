@@ -1,0 +1,127 @@
+/**
+ * RP2040 FreeRTOS Template - App #2
+ * MCP9808 I2C temperature sensor driver
+ *
+ * @copyright 2022, Tony Smith (@smittytone)
+ * @version   1.1.0
+ * @licence   MIT
+ *
+ */
+#include "main.h"
+
+using std::string;
+
+
+/**
+ * @brief Constructor: instantiate a new MCP9808 object.
+ *
+ * @param address: The I2C address of the device to write to.
+ */
+MCP9808::MCP9808(uint32_t address) {
+    if (address == 0x00 || address > 0xFF) address = MCP9808_I2CADDR_DEFAULT;
+    i2c_addr = address;
+}
+
+
+/**
+ * @brief Check the device is connected and operational.
+ *
+ * @retval `true` if we can read values and they are right, otherwise `false`.
+ */
+bool MCP9808::begin() {
+    // Set up alerts
+    //set_lower_limit(15);
+    set_upper_limit(21);
+    clear_alert(true);
+
+    // Prep data storage buffers
+    uint8_t mid_data[2] = {0,0};
+    uint8_t did_data[2] = {0,0};
+
+    // Read bytes from the sensor: MID...
+    I2C::write_byte(i2c_addr, MCP9808_REG_MANUF_ID);
+    I2C::read_block(i2c_addr, mid_data, 2);
+
+    // ...DID
+    I2C::write_byte(i2c_addr, MCP9808_REG_DEVICE_ID);
+    I2C::read_block(i2c_addr, did_data, 2);
+
+    // Bytes to integers
+    const uint16_t mid_value = (mid_data[0] << 8) | mid_data[1];
+    const uint16_t did_value = (did_data[0] << 8) | did_data[1];
+
+    // Returns True if the device is initialised, False otherwise.
+    return (mid_value == 0x0054 && did_value == 0x0400);
+}
+
+
+/**
+ * @brief Read the temperature.
+ *
+ * @retval The temperature in Celsius.
+ */
+double MCP9808::read_temp() {
+    // Read sensor and return its value in degrees celsius.
+    uint8_t temp_data[2] = {0};
+    I2C::write_byte(i2c_addr, MCP9808_REG_AMBIENT_TEMP);
+    I2C::read_block(i2c_addr, temp_data, 2);
+
+    // Scale and convert to signed value.
+    const uint32_t temp_raw = (temp_data[0] << 8) | temp_data[1];
+    double temp_cel = (temp_raw & 0x0FFF) / 16.0;
+    if (temp_raw & 0x1000) temp_cel = 256.0 - temp_cel;
+    return temp_cel;
+}
+
+
+void MCP9808::clear_alert(bool do_enable) {
+    // Read the reg value
+    uint8_t config_data[3] = {0};
+    I2C::write_byte(i2c_addr, MCP9808_REG_CONFIG);
+    I2C::read_block(i2c_addr, &config_data[1], 2);
+
+    // Set LSB bit 5 to clear the interrupt, and write it back
+    config_data[0] = MCP9808_REG_CONFIG;
+    config_data[2] |= MCP9808_CONFIG_CLR_ALRT_INT;
+
+    if (do_enable) {
+        config_data[2] = 0x2B;
+    }
+
+    // Write config data back with changes
+    printf("%02x %02x %02x\n",  config_data[0],  config_data[1],  config_data[2]);
+    I2C::write_block(i2c_addr, config_data, 3);
+
+    // Read it back to apply?
+    I2C::write_byte(i2c_addr, MCP9808_REG_CONFIG);
+    I2C::read_block(i2c_addr, config_data, 2);
+}
+
+
+void MCP9808::set_upper_limit(uint16_t upper_temp) {
+    upper_temp &= 127;
+    upper_temp = (upper_temp << 4);
+    uint8_t data[3] = {MCP9808_REG_UPPER_TEMP};
+    data[1] = (upper_temp & 0xFF00) >> 8;
+    data[2] = upper_temp & 0xFF;
+    I2C::write_block(i2c_addr, data, 3);
+
+    I2C::write_byte(i2c_addr, MCP9808_REG_UPPER_TEMP);
+    I2C::read_block(i2c_addr, data, 2);
+    const uint32_t temp_raw = (data[0] << 8) | data[1];
+    double temp_cel = (temp_raw & 0x0FFF) / 16.0;
+    if (temp_raw & 0x1000) temp_cel = 256.0 - temp_cel;
+    printf("UT: %f\n", temp_cel);
+}
+
+
+void MCP9808::set_lower_limit(uint16_t lower_temp) {
+    lower_temp &= 127;
+    lower_temp = (lower_temp << 4);
+    uint8_t data[3] = {MCP9808_REG_LOWER_TEMP};
+    data[1] = (lower_temp & 0xFF00) >> 8;
+    data[2] = lower_temp & 0xFF;
+    I2C::write_block(i2c_addr, data, 3);
+
+
+}

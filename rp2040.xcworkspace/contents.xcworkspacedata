@@ -55,6 +55,43 @@
          </FileRef>
       </Group>
       <Group
+         location = "group:App-IRQs"
+         name = "App-IRQs">
+         <FileRef
+            location = "group:CMakeLists.txt">
+         </FileRef>
+         <FileRef
+            location = "group:main.h">
+         </FileRef>
+         <FileRef
+            location = "group:main.cpp">
+         </FileRef>
+         <FileRef
+            location = "group:ht16k33.h">
+         </FileRef>
+         <FileRef
+            location = "group:ht16k33.cpp">
+         </FileRef>
+         <FileRef
+            location = "group:mcp9808.h">
+         </FileRef>
+         <FileRef
+            location = "group:mcp9808.cpp">
+         </FileRef>
+         <FileRef
+            location = "group:utils.h">
+         </FileRef>
+         <FileRef
+            location = "group:utils.cpp">
+         </FileRef>
+         <FileRef
+            location = "group:i2c_utils.h">
+         </FileRef>
+         <FileRef
+            location = "group:i2c_utils.cpp">
+         </FileRef>
+      </Group>
+      <Group
          location = "group:Config"
          name = "Config">
          <FileRef

@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.1.0
+# RP2040-FreeRTOS Template 1.2.0
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -11,6 +11,8 @@ More details [in this blog post](https://blog.smittytone.net/2022/02/24/how-to-u
 |___/App-Template           // Application 1 (FreeRTOS template) source code
     |___CMakeLists.txt      // Application-level CMake config file
 |___/App-Scheduling         // Application 2 (scheduling demo) source code
+    |___CMakeLists.txt      // Application-level CMake config file
+|___/App-Scheduling         // Application 3 (IRQs demo) source code
     |___CMakeLists.txt      // Application-level CMake config file
 |___/Config
     |___FreeRTOSConfig.h    // FreeRTOS project config file
@@ -61,6 +63,9 @@ The code demonstrates a basic FreeRTOS setup, but you can replace it entirely wi
 This app builds on the first by adding an MCP9808 temperature sensor and an HT16K33-based LED display. It is used by this BLOG POST.
 
 ![Circuit layout](./images/scheduler.png)
+
+### App Three: IRQs
+
 
 ## IDEs
 
