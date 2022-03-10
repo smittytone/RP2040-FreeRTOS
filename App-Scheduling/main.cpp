@@ -20,8 +20,10 @@ using std::stringstream;
 // This is the inter-task queue
 volatile QueueHandle_t queue = NULL;
 
-// Set a delay time of exactly 500ms
-const TickType_t ms_delay = 500 / portTICK_PERIOD_MS;
+// Task handles
+TaskHandle_t pico_task_handle;
+TaskHandle_t gpio_task_handle;
+TaskHandle_t sens_task_handle;
 
 // The 4-digit display
 HT16K33_Segment display;
@@ -282,24 +284,25 @@ int main() {
     display.set_brightness(1);
     
     // Set up two tasks
-    BaseType_t pico_status = xTaskCreate(led_task_pico, "PICO_LED_TASK",  128, NULL, 1, NULL);
-    BaseType_t gpio_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK",  128, NULL, 1, NULL);
-    BaseType_t sens_status = xTaskCreate(sensor_read_task, "SENSOR_TASK", 128, NULL, 1, NULL);
+    BaseType_t pico_task_status = xTaskCreate(led_task_pico, "PICO_LED_TASK",  128, NULL, 1, &pico_task_handle);
+    BaseType_t gpio_task_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK",  128, NULL, 1, &gpio_task_handle);
+    BaseType_t sens_task_status = xTaskCreate(sensor_read_task, "SENSOR_TASK", 128, NULL, 1, &sens_task_handle);
     
-    // Set up the event queue
-    queue = xQueueCreate(4, sizeof(uint8_t));
-    
-    // Start the FreeRTOS scheduler if any of the tasks are good
-    if (pico_status == pdPASS || gpio_status == pdPASS || sens_status == pdPASS) {
+    // Proceed if any of the tasks are good
+    if (pico_task_status == pdPASS || gpio_task_status == pdPASS || sens_task_status == pdPASS) {
+        // Set up the event queue
+        queue = xQueueCreate(4, sizeof(uint8_t));
+        
+        // Start the sceduler
         vTaskStartScheduler();
     } else {
         // Flash board LED 5 times
         uint8_t count = 5;
         while (count > 0) {
             led_on();
-            sleep_ms(100);
+            vTaskDelay(100);
             led_off();
-            sleep_ms(100);
+            vTaskDelay(100);
             count--;
         }
     }
