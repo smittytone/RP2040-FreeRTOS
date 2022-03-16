@@ -64,6 +64,8 @@ This app builds on the first by adding an MCP9808 temperature sensor and an HT16
 
 ![Circuit layout](./images/scheduler.png)
 
+* For more information, [see this blog post](https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/).
+
 ### App Three: IRQs
 
 

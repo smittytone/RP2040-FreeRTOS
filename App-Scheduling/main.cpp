@@ -140,7 +140,7 @@ void led_task_pico(void* unused_arg) {
         }
         
         // Yield -- uncomment the next line to enable,
-        // see BLOG POST
+        // See BLOG POST https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/
         //vTaskDelay(0);
     }
 }
@@ -169,7 +169,7 @@ void led_task_gpio(void* unused_arg) {
         }
         
         // Yield -- uncomment the next line to enable,
-        // see BLOG POST
+        // See BLOG POST https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/
         //vTaskDelay(0);
     }
 }
