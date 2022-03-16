@@ -1,5 +1,5 @@
 /**
- * RP2040 FreeRTOS Template - App #2
+ * RP2040 FreeRTOS Template - App #3
  *
  * @copyright 2022, Tony Smith (@smittytone)
  * @version   1.1.0
@@ -43,9 +43,15 @@ extern "C" {
 /**
  * CONSTANTS
  */
-#define         RED_LED_PIN           20
-#define         GRN_LED_PIN           15
-#define         SENSOR_ALERT_PIN      16
+#define         RED_LED_PIN                 20
+#define         GRN_LED_PIN                 15
+#define         SENSOR_ALERT_PIN            16
+
+#define         SENSOR_TASK_DELAY_TICKS     20
+
+#define         GPIO_LED_ON                 1
+#define         GPIO_LED_OFF                0
+
 
 /**
  * PROTOTYPES
@@ -55,6 +61,7 @@ void setup_led();
 void setup_i2c();
 void setup_gpio();
 
+void enable_irq(bool state);
 void gpio_cb(uint gpio, uint32_t events);
 
 void led_on();

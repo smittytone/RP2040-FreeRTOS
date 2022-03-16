@@ -1,5 +1,5 @@
 /**
- * RP2040 FreeRTOS Template - App #2
+ * RP2040 FreeRTOS Template - App #3
  *
  * @copyright 2022, Tony Smith (@smittytone)
  * @version   1.1.0
@@ -25,8 +25,10 @@ HT16K33_Segment display;
 
 // The sensor
 MCP9808 sensor;
+volatile bool sensor_good;
 volatile double read_temp = 0.0;
 volatile bool do_clear = false;
+volatile bool irq_hit = false;
 
 
 /*
@@ -94,8 +96,8 @@ void setup_i2c() {
 
     // Initialise the sensor
     sensor = MCP9808();
-    bool result = sensor.begin();
-    if (!result) {
+    sensor_good = sensor.begin();
+    if (!sensor_good) {
         printf("[ERROR] Sensor not configured\n");
     } else {
         log_debug("Sensor good");
@@ -117,9 +119,6 @@ void setup_gpio() {
     gpio_init(GRN_LED_PIN);
     gpio_set_dir(GRN_LED_PIN, GPIO_OUT);
     gpio_put(GRN_LED_PIN, false);
-
-    // IRQ on the sensor pin
-    gpio_set_irq_enabled_with_callback(SENSOR_ALERT_PIN, GPIO_IRQ_EDGE_RISE, true, &gpio_cb);
 }
 
 
@@ -127,7 +126,13 @@ void setup_gpio() {
  * @brief ISR for GPIO
  */
 void gpio_cb(uint gpio, uint32_t events) {
-    gpio_put(GRN_LED_PIN, true);
+    irq_hit = true;
+    enable_irq(false);
+}
+
+
+void enable_irq(bool state) {
+    gpio_set_irq_enabled_with_callback(SENSOR_ALERT_PIN, GPIO_IRQ_LEVEL_LOW, true, &gpio_cb);
 }
 
 
@@ -150,7 +155,10 @@ void led_task_pico(void* unused_arg) {
     #ifdef DEBUG
     log_device_info();
     #endif
-
+    
+    // IRQ on the sensor pin
+    if (sensor_good) enable_irq(true);
+    
     // Start the task loop
     while (true) {
         // Turn Pico LED on an add the LED state
@@ -162,16 +170,23 @@ void led_task_pico(void* unused_arg) {
             if (state) {
                 log_debug("PICO LED FLASH");
                 led_on();
-                pico_led_state = 1;
+                pico_led_state = GPIO_LED_OFF;
                 xQueueSendToBack(queue, &pico_led_state, 0);
                 display_int(++count);
             } else {
                 // Turn Pico LED off an add the LED state
                 // to the FreeRTOS xQUEUE
                 led_off();
-                pico_led_state = 0;
+                pico_led_state = GPIO_LED_ON;
                 xQueueSendToBack(queue, &pico_led_state, 0);
                 display_tmp(read_temp);
+                
+                // Handle post IRQ
+                if (read_temp < 25 && irq_hit) {
+                    sensor.clear_alert(false);
+                    irq_hit = false;
+                    enable_irq(true);
+                }
             }
 
             state = !state;
@@ -179,7 +194,7 @@ void led_task_pico(void* unused_arg) {
         }
 
         // Yield -- uncomment the next line to enable,
-        // see BLOG POST
+        // See BLOG POST https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/
         //vTaskDelay(0);
     }
 }
@@ -192,7 +207,7 @@ void led_task_pico(void* unused_arg) {
 void led_task_gpio(void* unused_arg) {
     // This variable will take a copy of the value
     // added to the FreeRTOS xQueue
-    uint8_t passed_value_buffer = 0;
+    uint8_t passed_value_buffer = GPIO_LED_OFF;
 
     while (true) {
         // Check for an item in the FreeRTOS xQueue
@@ -200,11 +215,13 @@ void led_task_gpio(void* unused_arg) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
             if (passed_value_buffer) log_debug("GPIO LED FLASH");
-            gpio_put(RED_LED_PIN, !(passed_value_buffer == 1));
+            gpio_put(RED_LED_PIN, (passed_value_buffer == GPIO_LED_ON));
         }
-
+        
+        gpio_put(GRN_LED_PIN, irq_hit);
+        
         // Yield -- uncomment the next line to enable,
-        // see BLOG POST
+        // See BLOG POST https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/
         //vTaskDelay(0);
     }
 }
@@ -214,7 +231,7 @@ void sensor_read_task(void* unused_arg) {
     while (true) {
         // Just read the sensor and yield
         read_temp = sensor.read_temp();
-        vTaskDelay(20);
+        vTaskDelay(SENSOR_TASK_DELAY_TICKS);
     }
 }
 
