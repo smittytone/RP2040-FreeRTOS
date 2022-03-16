@@ -1,5 +1,5 @@
 /**
- * RP2040 FreeRTOS Template - App #2
+ * RP2040 FreeRTOS Template - App #3
  * MCP9808 I2C temperature sensor driver
  *
  * @copyright 2022, Tony Smith (@smittytone)
@@ -29,9 +29,14 @@ MCP9808::MCP9808(uint32_t address) {
  * @retval `true` if we can read values and they are right, otherwise `false`.
  */
 bool MCP9808::begin() {
-    // Set up alerts
-    //set_lower_limit(15);
-    set_upper_limit(21);
+    // Set up alerts threshold temperatures
+    // NOTE You MUST set all three thresholds
+    //      for the alert to operate.
+    set_lower_limit(10);
+    set_upper_limit(25);
+    set_critical_limit(50);
+    
+    // Clear and enable the alert pin
     clear_alert(true);
 
     // Prep data storage buffers
@@ -67,61 +72,118 @@ double MCP9808::read_temp() {
     I2C::read_block(i2c_addr, temp_data, 2);
 
     // Scale and convert to signed value.
-    const uint32_t temp_raw = (temp_data[0] << 8) | temp_data[1];
-    double temp_cel = (temp_raw & 0x0FFF) / 16.0;
-    if (temp_raw & 0x1000) temp_cel = 256.0 - temp_cel;
-    return temp_cel;
+    return get_temp(temp_data);
 }
 
 
+/**
+ * @brief Clear the sensor's alert flag, CONFIG bit 5.
+ *        Optionally, enable the alert first.
+ *
+ * @param do_enable: Set to `true` to enable the alert.
+ */
 void MCP9808::clear_alert(bool do_enable) {
-    // Read the reg value
+    // Read the current reg value
     uint8_t config_data[3] = {0};
     I2C::write_byte(i2c_addr, MCP9808_REG_CONFIG);
     I2C::read_block(i2c_addr, &config_data[1], 2);
 
     // Set LSB bit 5 to clear the interrupt, and write it back
     config_data[0] = MCP9808_REG_CONFIG;
-    config_data[2] |= MCP9808_CONFIG_CLR_ALRT_INT;
+    config_data[2] = 0x21;
 
     if (do_enable) {
-        config_data[2] = 0x2B;
+        config_data[2] |= MCP9808_CONFIG_ENABLE_ALRT;
     }
 
     // Write config data back with changes
-    printf("%02x %02x %02x\n",  config_data[0],  config_data[1],  config_data[2]);
+    #ifdef DEBUG
+    printf("[DEBUG] Config out: %02x %02x %02x\n",  config_data[0],  config_data[1],  config_data[2]);
+    #endif
     I2C::write_block(i2c_addr, config_data, 3);
 
     // Read it back to apply?
+    uint8_t check_data[2] = {0};
     I2C::write_byte(i2c_addr, MCP9808_REG_CONFIG);
-    I2C::read_block(i2c_addr, config_data, 2);
+    I2C::read_block(i2c_addr, check_data, 2);
+    #ifdef DEBUG
+    printf("[DEBUG]  Config in: -- %02x %02x\n",  check_data[0],  check_data[1]);
+    #endif
 }
 
 
+/**
+ * @brief Set the sensor upper threshold temperature.
+ *
+ * @param upper_temp: The target temperature.
+ */
 void MCP9808::set_upper_limit(uint16_t upper_temp) {
-    upper_temp &= 127;
-    upper_temp = (upper_temp << 4);
-    uint8_t data[3] = {MCP9808_REG_UPPER_TEMP};
-    data[1] = (upper_temp & 0xFF00) >> 8;
-    data[2] = upper_temp & 0xFF;
-    I2C::write_block(i2c_addr, data, 3);
+    set_temp_limit(MCP9808_REG_UPPER_TEMP, upper_temp);
+}
 
-    I2C::write_byte(i2c_addr, MCP9808_REG_UPPER_TEMP);
+
+/**
+ * @brief Set the sensor critical threshold temperature.
+ *
+ * @param critical_temp: The target temperature.
+ */
+void MCP9808::set_critical_limit(uint16_t critical_temp) {
+    set_temp_limit(MCP9808_REG_CRIT_TEMP, critical_temp);
+}
+
+
+/**
+ * @brief Set the sensor lower threshold temperature.
+ *
+ * @param lower_temp: The target temperature.
+ */
+void MCP9808::set_lower_limit(uint16_t lower_temp) {
+    set_temp_limit(MCP9808_REG_LOWER_TEMP, lower_temp);
+}
+
+
+/**
+ * @brief Set a sensor threshold temperature.
+ *
+ * @param temp_register: The target register:
+ *                       MCP9808_REG_LOWER_TEMP
+ *                       MCP9808_REG_UPPER_TEMP
+ *                       MCP9808_REG_CRIT_TEMP.
+ * @param temp:          The temperature (as an integer)
+ */
+void MCP9808::set_temp_limit(uint8_t temp_register, uint16_t temp) {
+    temp &= 127;
+    temp = (temp << 4);
+    uint8_t data[3] = {temp_register};
+    data[1] = (temp & 0xFF00) >> 8;
+    data[2] = temp & 0xFF;
+    I2C::write_block(i2c_addr, data, 3);
+    
+    // Read and check upper temp
+    #ifdef DEBUG
+    string reg_name = "Lower Limit";
+    if (temp_register == MCP9808_REG_CRIT_TEMP) {
+        reg_name = "Critical Limit";
+    } else if (temp_register == MCP9808_REG_UPPER_TEMP) {
+        reg_name = "Upper Limit";
+    }
+
+    I2C::write_byte(i2c_addr, temp_register);
     I2C::read_block(i2c_addr, data, 2);
+    double temp_cel = get_temp(data);
+    printf("[DEBUG] %s: %.01f\n", reg_name.c_str(), temp_cel);
+    #endif
+}
+
+
+/**
+ * @brief Calculate the temperature.
+ *
+ * @retval The temperature in Celsius.
+ */
+double MCP9808::get_temp(uint8_t* data) {
     const uint32_t temp_raw = (data[0] << 8) | data[1];
     double temp_cel = (temp_raw & 0x0FFF) / 16.0;
     if (temp_raw & 0x1000) temp_cel = 256.0 - temp_cel;
-    printf("UT: %f\n", temp_cel);
-}
-
-
-void MCP9808::set_lower_limit(uint16_t lower_temp) {
-    lower_temp &= 127;
-    lower_temp = (lower_temp << 4);
-    uint8_t data[3] = {MCP9808_REG_LOWER_TEMP};
-    data[1] = (lower_temp & 0xFF00) >> 8;
-    data[2] = lower_temp & 0xFF;
-    I2C::write_block(i2c_addr, data, 3);
-
-
+    return temp_cel;
 }
