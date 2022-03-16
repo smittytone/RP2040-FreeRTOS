@@ -99,8 +99,6 @@ void setup_i2c() {
     sensor_good = sensor.begin();
     if (!sensor_good) {
         printf("[ERROR] Sensor not configured\n");
-    } else {
-        log_debug("Sensor good");
     }
 }
 

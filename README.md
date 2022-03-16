@@ -60,14 +60,15 @@ The code demonstrates a basic FreeRTOS setup, but you can replace it entirely wi
 
 ### App Two: Scheduling
 
-This app builds on the first by adding an MCP9808 temperature sensor and an HT16K33-based LED display. It is used by this BLOG POST.
+This app builds on the first by adding an MCP9808 temperature sensor and an HT16K33-based LED display. It is used in [this blog post](https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/).
 
 ![Circuit layout](./images/scheduler.png)
 
-* For more information, [see this blog post](https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/).
-
 ### App Three: IRQs
 
+This app builds on the second by using the MCP9808 temperature sensor to trigger an interrupt.
+
+![Circuit layout](./images/irqs.png)
 
 ## IDEs
 
