@@ -1,5 +1,5 @@
 /**
- * RP2040 FreeRTOS Template - App #2
+ * RP2040 FreeRTOS Template - App #3
  * General utility functions
  *
  * @copyright 2022, Tony Smith (@smittytone)
