@@ -14,6 +14,8 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
+#include <timers.h>
+#include <semphr.h>
 // CXX
 #include <iostream>
 #include <string>
@@ -44,13 +46,17 @@ extern "C" {
  * CONSTANTS
  */
 #define         RED_LED_PIN                 20
-#define         GRN_LED_PIN                 15
-#define         SENSOR_ALERT_PIN            16
+#define         ALERT_LED_PIN               15
+#define         ALERT_SENSE_PIN             16
 
 #define         SENSOR_TASK_DELAY_TICKS     20
 
 #define         GPIO_LED_ON                 1
 #define         GPIO_LED_OFF                0
+
+#define         TEMP_LOWER_LIMIT_C          10
+#define         TEMP_UPPER_LIMIT_C          25
+#define         TEMP_CRIT_LIMIT_C           50
 
 
 /**
@@ -61,7 +67,7 @@ void setup_led();
 void setup_i2c();
 void setup_gpio();
 
-void enable_irq(bool state);
+void enable_irq(bool state = true);
 void gpio_cb(uint gpio, uint32_t events);
 
 void led_on();
@@ -71,6 +77,7 @@ void led_set(bool state = true);
 void led_task_pico(void* unused_arg);
 void led_task_gpio(void* unused_arg);
 void sensor_read_task(void* unused_arg);
+void sensor_clear_task(void* unused_arg);
 
 void display_int(int number);
 void display_tmp(double value);
@@ -78,6 +85,7 @@ void display_tmp(double value);
 void log_debug(const char* msg);
 void log_device_info(void);
 
+void timer_fired(TimerHandle_t timer);
 
 
 

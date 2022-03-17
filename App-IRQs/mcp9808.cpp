@@ -32,9 +32,9 @@ bool MCP9808::begin() {
     // Set up alerts threshold temperatures
     // NOTE You MUST set all three thresholds
     //      for the alert to operate.
-    set_lower_limit(10);
-    set_upper_limit(25);
-    set_critical_limit(50);
+    set_lower_limit(TEMP_LOWER_LIMIT_C);
+    set_upper_limit(TEMP_UPPER_LIMIT_C);
+    set_critical_limit(TEMP_CRIT_LIMIT_C);
     
     // Clear and enable the alert pin
     clear_alert(true);

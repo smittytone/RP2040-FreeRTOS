@@ -18,7 +18,19 @@ using std::stringstream;
  */
 
 // This is the inter-task queue
-volatile QueueHandle_t queue = NULL;
+volatile QueueHandle_t flip_queue = NULL;
+volatile QueueHandle_t irq_queue = NULL;
+
+// Task handles
+TaskHandle_t pico_task_handle = NULL;
+TaskHandle_t gpio_task_handle = NULL;
+TaskHandle_t sens_task_handle = NULL;
+TaskHandle_t alrt_task_handle = NULL;
+
+// Semaphores
+SemaphoreHandle_t irq_semaphore = NULL;
+
+TimerHandle_t alert_timer = NULL;
 
 // The 4-digit display
 HT16K33_Segment display;
@@ -97,40 +109,51 @@ void setup_i2c() {
     // Initialise the sensor
     sensor = MCP9808();
     sensor_good = sensor.begin();
-    if (!sensor_good) {
-        printf("[ERROR] Sensor not configured\n");
-    }
+    if (!sensor_good) printf("[ERROR] MCP9808 not present\n");
 }
 
 
 void setup_gpio() {
-    gpio_init(SENSOR_ALERT_PIN);
-    gpio_set_dir(SENSOR_ALERT_PIN, GPIO_IN);
-    //gpio_pull_up(SENSOR_ALERT_PIN);
+    // Configure the MCP9808 alert reader
+    gpio_init(ALERT_SENSE_PIN);
+    gpio_set_dir(ALERT_SENSE_PIN, GPIO_IN);
 
     // Configure the GPIO LED
     gpio_init(RED_LED_PIN);
     gpio_set_dir(RED_LED_PIN, GPIO_OUT);
-    gpio_put(GRN_LED_PIN, false);
+    gpio_put(ALERT_LED_PIN, false);
 
     // Configure the GREEN LED
-    gpio_init(GRN_LED_PIN);
-    gpio_set_dir(GRN_LED_PIN, GPIO_OUT);
-    gpio_put(GRN_LED_PIN, false);
+    gpio_init(ALERT_LED_PIN);
+    gpio_set_dir(ALERT_LED_PIN, GPIO_OUT);
+    gpio_put(ALERT_LED_PIN, false);
 }
 
 
+/*
+ * IRQ
+ */
+
 /**
- * @brief ISR for GPIO
+ * @brief ISR for GPIO.
+ *
+ * @param gpio:   The pin that generates the event.
+ * @param events: Which event(s) triggered the IRQ.
  */
 void gpio_cb(uint gpio, uint32_t events) {
-    irq_hit = true;
+    static bool state = 1;
+    xQueueSendToBackFromISR(flip_queue, &state, 0);
     enable_irq(false);
 }
 
 
+/**
+ * @brief Enable or disable the IRQ,
+ *
+ * @param state: The enablement state. Default: `true`.
+ */
 void enable_irq(bool state) {
-    gpio_set_irq_enabled_with_callback(SENSOR_ALERT_PIN, GPIO_IRQ_LEVEL_LOW, true, &gpio_cb);
+    gpio_set_irq_enabled_with_callback(ALERT_SENSE_PIN, GPIO_IRQ_LEVEL_LOW, state, &gpio_cb);
 }
 
 
@@ -154,9 +177,6 @@ void led_task_pico(void* unused_arg) {
     log_device_info();
     #endif
     
-    // IRQ on the sensor pin
-    if (sensor_good) enable_irq(true);
-    
     // Start the task loop
     while (true) {
         // Turn Pico LED on an add the LED state
@@ -166,27 +186,19 @@ void led_task_pico(void* unused_arg) {
             then = now;
 
             if (state) {
+                #ifdef DEBUG
                 log_debug("PICO LED FLASH");
+                #endif
+                
                 led_on();
-                pico_led_state = GPIO_LED_OFF;
-                xQueueSendToBack(queue, &pico_led_state, 0);
                 display_int(++count);
             } else {
-                // Turn Pico LED off an add the LED state
-                // to the FreeRTOS xQUEUE
                 led_off();
-                pico_led_state = GPIO_LED_ON;
-                xQueueSendToBack(queue, &pico_led_state, 0);
                 display_tmp(read_temp);
-                
-                // Handle post IRQ
-                if (read_temp < 25 && irq_hit) {
-                    sensor.clear_alert(false);
-                    irq_hit = false;
-                    enable_irq(true);
-                }
             }
-
+            
+            pico_led_state = state ? GPIO_LED_OFF : GPIO_LED_ON;
+            xQueueSendToBack(flip_queue, &pico_led_state, 0);
             state = !state;
             if (count > 9998) count = 0;
         }
@@ -209,14 +221,15 @@ void led_task_gpio(void* unused_arg) {
 
     while (true) {
         // Check for an item in the FreeRTOS xQueue
-        if (xQueueReceive(queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
+        if (xQueueReceive(flip_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
             if (passed_value_buffer) log_debug("GPIO LED FLASH");
             gpio_put(RED_LED_PIN, (passed_value_buffer == GPIO_LED_ON));
         }
         
-        gpio_put(GRN_LED_PIN, irq_hit);
+        // Update the alert indicator
+        gpio_put(ALERT_LED_PIN, irq_hit);
         
         // Yield -- uncomment the next line to enable,
         // See BLOG POST https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/
@@ -225,6 +238,10 @@ void led_task_gpio(void* unused_arg) {
 }
 
 
+/**
+ * @brief Repeatedly read the sensor and store the current
+ *        temperature.
+ */
 void sensor_read_task(void* unused_arg) {
     while (true) {
         // Just read the sensor and yield
@@ -233,6 +250,52 @@ void sensor_read_task(void* unused_arg) {
     }
 }
 
+
+/**
+ * @brief Repeatedly check for an ISR-issued notification that
+ *        the sensor alert was triggered.
+ */
+void sensor_clear_task(void* unused_arg) {
+    uint8_t passed_value_buffer = 0;
+    
+    while (true) {
+        if (xQueueReceive(irq_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
+            if (passed_value_buffer == 1) {
+                #ifdef DEBUG
+                log_debug("IRQ detected");
+                #endif
+                
+                // Record the IRQ was hit
+                irq_hit = true;
+                
+                // Set a timer to clear the alert
+                alert_timer = xTimerCreate("ALERT_TIMER", pdMS_TO_TICKS(5000), pdFALSE, (void*)0, timer_fired);
+            }
+        }
+    }
+}
+
+
+/**
+ * @brief Callback actioned when the post IRQ timer fires.
+ *
+ * @param timer: The triggering timer.
+ */
+void timer_fired(TimerHandle_t timer) {
+    #ifdef DEBUG
+    log_debug("Timer fired");
+    #endif
+    
+    irq_hit = false;
+    if (read_temp < (double)TEMP_UPPER_LIMIT_C) {
+        // Reset the sensor alert
+        sensor.clear_alert(false);
+        irq_hit = false;
+        
+        // IRQ disabled at this point, so reenable it
+        enable_irq(true);
+    }
+}
 
 /**
  * @brief Display a four-digit decimal value on the 4-digit display.
@@ -324,16 +387,22 @@ int main() {
     setup();
     display.set_brightness(1);
 
-    // Set up two tasks
-    BaseType_t pico_status = xTaskCreate(led_task_pico, "PICO_LED_TASK",  128, NULL, 1, NULL);
-    BaseType_t gpio_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK",  128, NULL, 1, NULL);
-    BaseType_t sens_status = xTaskCreate(sensor_read_task, "SENS_LED_TASK", 64, NULL, 1, NULL);
-
+    // IRQ on the sensor pin
+    if (sensor_good) enable_irq(true);
+    
+    
+    // Set up four tasks
+    BaseType_t pico_task_status = xTaskCreate(led_task_pico, "PICO_LED_TASK",   128, NULL, 1, &pico_task_handle);
+    BaseType_t gpio_task_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK",   128, NULL, 1, &gpio_task_handle);
+    BaseType_t sens_task_status = xTaskCreate(sensor_read_task, "SENSOR_TASK",  128, NULL, 1, &sens_task_handle);
+    BaseType_t alert_task_status = xTaskCreate(sensor_clear_task, "ALERT_TASK", 128, NULL, 1, &alrt_task_handle);
+    
     // Set up the event queue
-    queue = xQueueCreate(4, sizeof(uint8_t));
+    flip_queue = xQueueCreate(4, sizeof(uint8_t));
+    irq_queue = xQueueCreate(1, sizeof(uint8_t));
 
     // Start the FreeRTOS scheduler if any of the tasks are good
-    if (pico_status == pdPASS || gpio_status == pdPASS || sens_status == pdPASS) {
+    if (pico_task_status == pdPASS || gpio_task_status == pdPASS || sens_task_status == pdPASS) {
         vTaskStartScheduler();
     } else {
         // Flash board LED 5 times

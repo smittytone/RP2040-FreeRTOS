@@ -283,7 +283,7 @@ int main() {
     setup();
     display.set_brightness(1);
     
-    // Set up two tasks
+    // Set up three tasks
     BaseType_t pico_task_status = xTaskCreate(led_task_pico, "PICO_LED_TASK",  128, NULL, 1, &pico_task_handle);
     BaseType_t gpio_task_status = xTaskCreate(led_task_gpio, "GPIO_LED_TASK",  128, NULL, 1, &gpio_task_handle);
     BaseType_t sens_task_status = xTaskCreate(sensor_read_task, "SENSOR_TASK", 128, NULL, 1, &sens_task_handle);

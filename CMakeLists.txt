@@ -20,7 +20,7 @@ set(APP_2_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Scheduling")
 set(APP_3_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-IRQs")
 
 # Set app-side debugging ON or OFF
-set(DO_DEBUG ON)
+set(DO_DEBUG "ON")
 
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
 # Comment out the set() if you have a global copy of the
