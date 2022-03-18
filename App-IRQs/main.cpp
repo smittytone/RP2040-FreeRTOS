@@ -141,8 +141,18 @@ void setup_gpio() {
  */
 void gpio_isr(uint gpio, uint32_t events) {
     static bool state = 1;
-    xQueueSendToBackFromISR(irq_queue, &state, 0);
+    static BaseType_t higher_priority_task_woken = pdFALSE;
+    
+    // Clear the URQ source
     enable_irq(false);
+    
+    // Signal the alert clearance task
+    xQueueSendToBackFromISR(irq_queue, &state, 0);
+    //xSemaphoreGiveFromISR(semaphore_irq, &higher_priority_task_woken);
+    //vTaskNotifyGiveFromISR(handle_task_alrt, &higher_priority_task_woken);
+    
+    // Force a context switch if higher_priority_task_woken == `true`
+    portYIELD_FROM_ISR(higher_priority_task_woken);
 }
 
 
@@ -268,7 +278,8 @@ void task_sensor_alrt(void* unused_arg) {
     while (true) {
         // Wait for event: is a message pending in the IRQ queue?
         if (xQueueReceive(irq_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
-        //if (xSemaphoreTake(semaphore_irq, 1) == pdPASS) {
+        //if (xSemaphoreTake(semaphore_irq, portMAX_DELAY) == pdPASS) {
+        //ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             if (passed_value_buffer == 1) {
                 #ifdef DEBUG
                 log_debug("IRQ detected");
@@ -300,9 +311,10 @@ void timer_fired_callback(TimerHandle_t timer) {
     log_debug("Timer fired");
     #endif
     
-    irq_hit = false;
-    alert_timer = NULL;
     if (read_temp < (double)TEMP_UPPER_LIMIT_C) {
+        irq_hit = false;
+        alert_timer = NULL;
+        
         // Reset the sensor alert
         sensor.clear_alert(true);
         
@@ -408,9 +420,6 @@ int main() {
     log_device_info();
     #endif
     
-    semaphore_irq = xSemaphoreCreateBinary();
-    assert(semaphore_irq != NULL);
-    
     // Set up four tasks
     BaseType_t status_task_pico = xTaskCreate(task_led_pico, "PICO_LED_TASK",  128, NULL, 1, &handle_task_pico);
     BaseType_t status_task_gpio = xTaskCreate(task_led_gpio, "GPIO_LED_TASK",  128, NULL, 1, &handle_task_gpio);
@@ -422,6 +431,9 @@ int main() {
         // Set up the event queues
         flip_queue = xQueueCreate(4, sizeof(uint8_t));
         irq_queue = xQueueCreate(1, sizeof(uint8_t));
+        
+        semaphore_irq = xSemaphoreCreateBinary();
+        assert(semaphore_irq != NULL);
         
         // Start the scheduler
         vTaskStartScheduler();
