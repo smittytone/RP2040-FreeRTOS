@@ -115,7 +115,6 @@ void led_task_pico(void* unused_arg) {
     while (true) {
         // Turn Pico LED on an add the LED state
         // to the FreeRTOS xQUEUE
-        
         TickType_t now = xTaskGetTickCount();
         if (now - then >= 500) {
             then = now;

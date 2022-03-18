@@ -65,8 +65,8 @@ target_include_directories(FreeRTOS PUBLIC
 )
 
 # Include the apps' source code
-#add_subdirectory(${APP_1_SRC_DIRECTORY})
-#add_subdirectory(${APP_2_SRC_DIRECTORY})
+add_subdirectory(${APP_1_SRC_DIRECTORY})
+add_subdirectory(${APP_2_SRC_DIRECTORY})
 add_subdirectory(${APP_3_SRC_DIRECTORY})
 
 # Clean up
