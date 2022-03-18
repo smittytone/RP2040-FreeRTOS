@@ -303,11 +303,13 @@ void timer_fired_callback(TimerHandle_t timer) {
     irq_hit = false;
     alert_timer = NULL;
     if (read_temp < (double)TEMP_UPPER_LIMIT_C) {
-        // IRQ disabled at this point, so reenable it
-        enable_irq(true);
-        
         // Reset the sensor alert
         sensor.clear_alert(true);
+        
+        // IRQ disabled at this point, so reenable it
+        // NOTE This has to come after the previous line, or it
+        //      will trip immediately!
+        enable_irq(true);
     }
 }
 
