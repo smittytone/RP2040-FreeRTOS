@@ -46,13 +46,15 @@ extern "C" {
  * CONSTANTS
  */
 #define         RED_LED_PIN                 20
-#define         ALERT_LED_PIN               15
+#define         ALERT_LED_PIN               26
 #define         ALERT_SENSE_PIN             16
 
 #define         SENSOR_TASK_DELAY_TICKS     20
+#define         ALERT_DISPLAY_PERIOD_MS     10000
 
-#define         GPIO_LED_ON                 1
-#define         GPIO_LED_OFF                0
+#define         LED_ON                      1
+#define         LED_OFF                     0
+#define         LED_ERROR_FLASHES           5
 
 #define         TEMP_LOWER_LIMIT_C          10
 #define         TEMP_UPPER_LIMIT_C          25
@@ -68,16 +70,16 @@ void setup_i2c();
 void setup_gpio();
 
 void enable_irq(bool state = true);
-void gpio_cb(uint gpio, uint32_t events);
+void gpio_isr(uint gpio, uint32_t events);
 
 void led_on();
 void led_off();
 void led_set(bool state = true);
 
-void led_task_pico(void* unused_arg);
-void led_task_gpio(void* unused_arg);
-void sensor_read_task(void* unused_arg);
-void sensor_clear_task(void* unused_arg);
+void task_led_pico(void* unused_arg);
+void task_led_gpio(void* unused_arg);
+void task_sensor_read(void* unused_arg);
+void task_sensor_alrt(void* unused_arg);
 
 void display_int(int number);
 void display_tmp(double value);
@@ -85,7 +87,7 @@ void display_tmp(double value);
 void log_debug(const char* msg);
 void log_device_info(void);
 
-void timer_fired(TimerHandle_t timer);
+void timer_fired_callback(TimerHandle_t timer);
 
 
 
