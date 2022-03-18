@@ -98,7 +98,7 @@ void MCP9808::clear_alert(bool do_enable) {
 
     // Write config data back with changes
     #ifdef DEBUG
-    printf("[DEBUG] Config out: %02x %02x %02x\n",  config_data[0],  config_data[1],  config_data[2]);
+    printf("[DEBUG] MCP9809 alert config write: %02x %02x %02x\n",  config_data[0],  config_data[1],  config_data[2]);
     #endif
     I2C::write_block(i2c_addr, config_data, 3);
 
@@ -107,7 +107,7 @@ void MCP9808::clear_alert(bool do_enable) {
     I2C::write_byte(i2c_addr, MCP9808_REG_CONFIG);
     I2C::read_block(i2c_addr, check_data, 2);
     #ifdef DEBUG
-    printf("[DEBUG]  Config in: -- %02x %02x\n",  check_data[0],  check_data[1]);
+    printf("[DEBUG] MCP9809 alert config read:  -- %02x %02x\n",  check_data[0],  check_data[1]);
     #endif
 }
 
