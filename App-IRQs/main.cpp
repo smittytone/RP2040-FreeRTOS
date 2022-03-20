@@ -17,8 +17,9 @@ using std::stringstream;
  * GLOBALS
  */
 
-// This is the inter-task queue
+// Inter-task queues
 QueueHandle_t flip_queue = NULL;
+QueueHandle_t irq_queue = NULL;
 
 // Task handles
 TaskHandle_t handle_task_pico = NULL;
@@ -27,9 +28,10 @@ TaskHandle_t handle_task_read = NULL;
 TaskHandle_t handle_task_alrt = NULL;
 
 // Timers
-SemaphoreHandle_t semaphore_irq = NULL;
 TimerHandle_t alert_timer = NULL;
-QueueHandle_t irq_queue = NULL;
+
+// Semaphores
+SemaphoreHandle_t semaphore_irq = NULL;
 
 // The 4-digit display
 HT16K33_Segment display;
@@ -39,7 +41,6 @@ MCP9808 sensor;
 volatile double read_temp = 0.0;
 volatile bool sensor_good = false;
 volatile bool do_clear = false;
-
 
 
 /*
@@ -148,11 +149,6 @@ void gpio_isr(uint gpio, uint32_t events) {
     
     // Signal the alert clearance task
     xQueueSendToBackFromISR(irq_queue, &state, 0);
-    //xSemaphoreGiveFromISR(semaphore_irq, &higher_priority_task_woken);
-    //vTaskNotifyGiveFromISR(handle_task_alrt, &higher_priority_task_woken);
-    
-    // Force a context switch if higher_priority_task_woken == `true`
-    portYIELD_FROM_ISR(higher_priority_task_woken);
 }
 
 
@@ -273,8 +269,6 @@ void task_sensor_alrt(void* unused_arg) {
     while (true) {
         // Wait for event: is a message pending in the IRQ queue?
         if (xQueueReceive(irq_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
-        //if (xSemaphoreTake(semaphore_irq, portMAX_DELAY) == pdPASS) {
-        //ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             if (passed_value_buffer == 1) {
                 #ifdef DEBUG
                 log_debug("IRQ detected");
@@ -319,6 +313,7 @@ void timer_fired_callback(TimerHandle_t timer) {
         enable_irq(true);
     }
 }
+
 
 /**
  * @brief Display a four-digit decimal value on the 4-digit display.
@@ -423,10 +418,11 @@ int main() {
     
     // Start the FreeRTOS scheduler if any of the tasks are good
     if (status_task_pico == pdPASS || status_task_gpio == pdPASS || (status_task_read == pdPASS && status_task_alrt == pdPASS)) {
-        // Set up the event queues
+        // Set up the event queues: one for flips, one for IRQs
         flip_queue = xQueueCreate(4, sizeof(uint8_t));
         irq_queue = xQueueCreate(1, sizeof(uint8_t));
         
+        // Create a binary semaphore to signal IRQs
         semaphore_irq = xSemaphoreCreateBinary();
         assert(semaphore_irq != NULL);
         
