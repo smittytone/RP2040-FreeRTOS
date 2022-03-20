@@ -88,7 +88,7 @@ void log_debug(const char* msg);
 void log_device_info(void);
 
 void timer_fired_callback(TimerHandle_t timer);
-
+void set_alert_timer();
 
 
 #ifdef __cplusplus

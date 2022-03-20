@@ -301,12 +301,7 @@ void task_sensor_alrt(void* unused_arg) {
         gpio_put(ALERT_LED_PIN, true);
 
         // Set and start a timer to clear the alert
-        alert_timer = xTimerCreate("ALERT_TIMER",
-                                pdMS_TO_TICKS(ALERT_DISPLAY_PERIOD_MS),
-                                pdFALSE,
-                                (void*)0,
-                                timer_fired_callback);
-        if (alert_timer != NULL) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
+        set_alert_timer();
     }
     
     //  ALERT HANDLER TASK FUNCTION BODY USING A SEMAPHORE
@@ -322,12 +317,7 @@ void task_sensor_alrt(void* unused_arg) {
              gpio_put(ALERT_LED_PIN, true);
 
              // Set and start a timer to clear the alert
-             alert_timer = xTimerCreate("ALERT_TIMER",
-                                     pdMS_TO_TICKS(ALERT_DISPLAY_PERIOD_MS),
-                                     pdFALSE,
-                                     (void*)0,
-                                     timer_fired_callback);
-             if (alert_timer != NULL) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
+             set_alert_timer();
          }
      }
      */
@@ -349,12 +339,7 @@ void task_sensor_alrt(void* unused_arg) {
                 gpio_put(ALERT_LED_PIN, true);
                 
                 // Set and start a timer to clear the alert
-                alert_timer = xTimerCreate("ALERT_TIMER",
-                                           pdMS_TO_TICKS(ALERT_DISPLAY_PERIOD_MS),
-                                           pdFALSE,
-                                           (void*)0,
-                                           timer_fired_callback);
-                if (alert_timer != NULL) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
+                set_alert_timer();
             }
         }
     }
@@ -383,7 +368,23 @@ void timer_fired_callback(TimerHandle_t timer) {
         // NOTE This has to come after the previous line, or it
         //      will trip immediately!
         enable_irq(true);
+    } else {
+        // Start the timer again
+        set_alert_timer();
     }
+}
+
+
+/**
+ * @brief Set and start a timer to clear the alert.
+ */
+void set_alert_timer() {
+    alert_timer = xTimerCreate("ALERT_TIMER",
+                               pdMS_TO_TICKS(ALERT_DISPLAY_PERIOD_MS),
+                               pdFALSE,
+                               (void*)0,
+                               timer_fired_callback);
+    if (alert_timer != NULL) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
 }
 
 
