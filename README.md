@@ -66,7 +66,7 @@ This app builds on the first by adding an MCP9808 temperature sensor and an HT16
 
 ### App Three: IRQs
 
-This app builds on the second by using the MCP9808 temperature sensor to trigger an interrupt. It is used in [this blog post]().
+This app builds on the second by using the MCP9808 temperature sensor to trigger an interrupt. It is used in [this blog post](https://blog.smittytone.net/2022/03/20/fun-with-freertos-and-pi-pico-interrupts-semaphores-notifications/).
 
 ![Circuit layout](./images/irqs.png)
 
