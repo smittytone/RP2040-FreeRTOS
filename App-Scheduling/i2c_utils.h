@@ -3,7 +3,7 @@
  * Generic I2C functions
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.1.0
+ * @version   1.2.0
  * @licence   MIT
  *
  */

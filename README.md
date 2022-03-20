@@ -12,7 +12,7 @@ More details [in this blog post](https://blog.smittytone.net/2022/02/24/how-to-u
     |___CMakeLists.txt      // Application-level CMake config file
 |___/App-Scheduling         // Application 2 (scheduling demo) source code
     |___CMakeLists.txt      // Application-level CMake config file
-|___/App-Scheduling         // Application 3 (IRQs demo) source code
+|___/App-IRQs               // Application 3 (IRQs demo) source code
     |___CMakeLists.txt      // Application-level CMake config file
 |___/Config
     |___FreeRTOSConfig.h    // FreeRTOS project config file
@@ -66,7 +66,7 @@ This app builds on the first by adding an MCP9808 temperature sensor and an HT16
 
 ### App Three: IRQs
 
-This app builds on the second by using the MCP9808 temperature sensor to trigger an interrupt.
+This app builds on the second by using the MCP9808 temperature sensor to trigger an interrupt. It is used in [this blog post]().
 
 ![Circuit layout](./images/irqs.png)
 
