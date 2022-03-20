@@ -141,14 +141,38 @@ void setup_gpio() {
  * @param events: Which event(s) triggered the IRQ.
  */
 void gpio_isr(uint gpio, uint32_t events) {
-    static bool state = 1;
-    static BaseType_t higher_priority_task_woken = pdFALSE;
-    
-    // Clear the URQ source
+    // Clear the IRQ source
     enable_irq(false);
+    
+    // ISR FUNCTION BODY USING DIRECT TASK NOTIFICATIONS
+    static BaseType_t higher_priority_task_woken = pdFALSE;
+        
+    // Signal the alert clearance task
+    vTaskNotifyGiveFromISR(handle_task_alrt, &higher_priority_task_woken);
+    
+    // Exit to context switch if necessary
+    portYIELD_FROM_ISR(higher_priority_task_woken);
+    
+    
+    // ISR FUNCTION BODY USING A SEMAPHORE
+    /*
+    static BaseType_t higher_priority_task_woken = pdFALSE;
+         
+    // Signal the alert clearance task
+    xSemaphoreGiveFromISR(semaphore_irq, &higher_priority_task_woken);
+    
+    // Exit to context switch if necessary
+    portYIELD_FROM_ISR(higher_priority_task_woken);
+     */
+    
+    
+    //  ISR FUNCTION BODY USING A QUEUE
+    /*
+    static bool state = 1;
     
     // Signal the alert clearance task
     xQueueSendToBackFromISR(irq_queue, &state, 0);
+     */
 }
 
 
@@ -264,6 +288,53 @@ void task_sensor_read(void* unused_arg) {
  *        the sensor alert was triggered.
  */
 void task_sensor_alrt(void* unused_arg) {
+    //  ALERT HANDLER TASK FUNCTION BODY USING DIRECT TASK NOTIFICATIONS
+    while (true) {
+        // Block until a notification arrives
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        
+        #ifdef DEBUG
+        log_debug("IRQ detected");
+        #endif
+
+        // Show the IRQ was hit
+        gpio_put(ALERT_LED_PIN, true);
+
+        // Set and start a timer to clear the alert
+        alert_timer = xTimerCreate("ALERT_TIMER",
+                                pdMS_TO_TICKS(ALERT_DISPLAY_PERIOD_MS),
+                                pdFALSE,
+                                (void*)0,
+                                timer_fired_callback);
+        if (alert_timer != NULL) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
+    }
+    
+    //  ALERT HANDLER TASK FUNCTION BODY USING A SEMAPHORE
+    /*
+    while (true) {
+        // Wait for event: is there a semaphore?
+        if (xSemaphoreTake(semaphore_irq, portMAX_DELAY) == pdPASS) {
+             #ifdef DEBUG
+             log_debug("IRQ detected");
+             #endif
+
+             // Show the IRQ was hit
+             gpio_put(ALERT_LED_PIN, true);
+
+             // Set and start a timer to clear the alert
+             alert_timer = xTimerCreate("ALERT_TIMER",
+                                     pdMS_TO_TICKS(ALERT_DISPLAY_PERIOD_MS),
+                                     pdFALSE,
+                                     (void*)0,
+                                     timer_fired_callback);
+             if (alert_timer != NULL) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
+         }
+     }
+     */
+    
+    
+    //  ALERT HANDLER TASK FUNCTION BODY USING A QUEUE
+    /*
     uint8_t passed_value_buffer = 0;
    
     while (true) {
@@ -287,6 +358,7 @@ void task_sensor_alrt(void* unused_arg) {
             }
         }
     }
+     */
 }
 
 
