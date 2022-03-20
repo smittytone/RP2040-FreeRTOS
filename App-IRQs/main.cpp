@@ -18,8 +18,7 @@ using std::stringstream;
  */
 
 // This is the inter-task queue
-volatile QueueHandle_t flip_queue = NULL;
-volatile QueueHandle_t irq_queue = NULL;
+QueueHandle_t flip_queue = NULL;
 
 // Task handles
 TaskHandle_t handle_task_pico = NULL;
@@ -30,6 +29,7 @@ TaskHandle_t handle_task_alrt = NULL;
 // Timers
 SemaphoreHandle_t semaphore_irq = NULL;
 TimerHandle_t alert_timer = NULL;
+QueueHandle_t irq_queue = NULL;
 
 // The 4-digit display
 HT16K33_Segment display;
@@ -39,7 +39,7 @@ MCP9808 sensor;
 volatile double read_temp = 0.0;
 volatile bool sensor_good = false;
 volatile bool do_clear = false;
-volatile bool irq_hit = false;
+
 
 
 /*
@@ -211,8 +211,6 @@ void task_led_pico(void* unused_arg) {
                 display_tmp(read_temp);
             }
             
-            
-            
             state = !state;
             if (count > 9998) count = 0;
         }
@@ -245,9 +243,6 @@ void task_led_gpio(void* unused_arg) {
             gpio_put(RED_LED_PIN, passed_value_buffer);
         }
         
-        // Update the alert indicator
-        gpio_put(ALERT_LED_PIN, irq_hit);
-        
         // Yield -- uncomment the next line to enable,
         // See BLOG POST https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/
         //vTaskDelay(0);
@@ -274,7 +269,7 @@ void task_sensor_read(void* unused_arg) {
  */
 void task_sensor_alrt(void* unused_arg) {
     uint8_t passed_value_buffer = 0;
-    
+   
     while (true) {
         // Wait for event: is a message pending in the IRQ queue?
         if (xQueueReceive(irq_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
@@ -285,8 +280,8 @@ void task_sensor_alrt(void* unused_arg) {
                 log_debug("IRQ detected");
                 #endif
                 
-                // Record the IRQ was hit
-                irq_hit = true;
+                // Show the IRQ was hit
+                gpio_put(ALERT_LED_PIN, true);
                 
                 // Set and start a timer to clear the alert
                 alert_timer = xTimerCreate("ALERT_TIMER",
@@ -312,7 +307,7 @@ void timer_fired_callback(TimerHandle_t timer) {
     #endif
     
     if (read_temp < (double)TEMP_UPPER_LIMIT_C) {
-        irq_hit = false;
+        gpio_put(ALERT_LED_PIN, false);
         alert_timer = NULL;
         
         // Reset the sensor alert
