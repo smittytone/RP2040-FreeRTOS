@@ -141,24 +141,24 @@ void setup_gpio() {
  * @param events: Which event(s) triggered the IRQ.
  */
 void gpio_isr(uint gpio, uint32_t events) {
+    // See BLOG POST https://blog.smittytone.net/2022/03/20/fun-with-freertos-and-pi-pico-interrupts-semaphores-notifications/
+    
     // Clear the IRQ source
     enable_irq(false);
     
-    // ISR FUNCTION BODY USING DIRECT TASK NOTIFICATIONS
-    static BaseType_t higher_priority_task_woken = pdFALSE;
-        
+    /* ISR FUNCTION BODY USING DIRECT TASK NOTIFICATIONS */
     // Signal the alert clearance task
+    static BaseType_t higher_priority_task_woken = pdFALSE;
     vTaskNotifyGiveFromISR(handle_task_alrt, &higher_priority_task_woken);
     
     // Exit to context switch if necessary
     portYIELD_FROM_ISR(higher_priority_task_woken);
     
     
-    // ISR FUNCTION BODY USING A SEMAPHORE
+    /* ISR FUNCTION BODY USING A SEMAPHORE */
     /*
-    static BaseType_t higher_priority_task_woken = pdFALSE;
-         
     // Signal the alert clearance task
+    static BaseType_t higher_priority_task_woken = pdFALSE;
     xSemaphoreGiveFromISR(semaphore_irq, &higher_priority_task_woken);
     
     // Exit to context switch if necessary
@@ -166,11 +166,10 @@ void gpio_isr(uint gpio, uint32_t events) {
      */
     
     
-    //  ISR FUNCTION BODY USING A QUEUE
+    /*  ISR FUNCTION BODY USING A QUEUE */
     /*
-    static bool state = 1;
-    
     // Signal the alert clearance task
+    static bool state = 1;
     xQueueSendToBackFromISR(irq_queue, &state, 0);
      */
 }
@@ -288,7 +287,9 @@ void task_sensor_read(void* unused_arg) {
  *        the sensor alert was triggered.
  */
 void task_sensor_alrt(void* unused_arg) {
-    //  ALERT HANDLER TASK FUNCTION BODY USING DIRECT TASK NOTIFICATIONS
+    // See BLOG POST https://blog.smittytone.net/2022/03/20/fun-with-freertos-and-pi-pico-interrupts-semaphores-notifications/
+    
+    /*  ALERT HANDLER TASK FUNCTION BODY USING DIRECT TASK NOTIFICATIONS */
     while (true) {
         // Block until a notification arrives
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -304,7 +305,7 @@ void task_sensor_alrt(void* unused_arg) {
         set_alert_timer();
     }
     
-    //  ALERT HANDLER TASK FUNCTION BODY USING A SEMAPHORE
+    /*  ALERT HANDLER TASK FUNCTION BODY USING A SEMAPHORE */
     /*
     while (true) {
         // Wait for event: is there a semaphore?
@@ -323,7 +324,7 @@ void task_sensor_alrt(void* unused_arg) {
      */
     
     
-    //  ALERT HANDLER TASK FUNCTION BODY USING A QUEUE
+    /*  ALERT HANDLER TASK FUNCTION BODY USING A QUEUE */
     /*
     uint8_t passed_value_buffer = 0;
    
