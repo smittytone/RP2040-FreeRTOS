@@ -47,13 +47,7 @@
          location = "group:Common"
          name = "Common">
          <FileRef
-            location = "group:i2c_utils.cpp">
-         </FileRef>
-         <FileRef
-            location = "group:utils.h">
-         </FileRef>
-         <FileRef
-            location = "group:utils.cpp">
+            location = "group:ht16k33.h">
          </FileRef>
          <FileRef
             location = "group:ht16k33.cpp">
@@ -62,13 +56,19 @@
             location = "group:mcp9808.h">
          </FileRef>
          <FileRef
+            location = "group:mcp9808.cpp">
+         </FileRef>
+         <FileRef
             location = "group:i2c_utils.h">
          </FileRef>
          <FileRef
-            location = "group:ht16k33.h">
+            location = "group:i2c_utils.cpp">
          </FileRef>
          <FileRef
-            location = "group:mcp9808.cpp">
+            location = "group:utils.h">
+         </FileRef>
+         <FileRef
+            location = "group:utils.cpp">
          </FileRef>
       </Group>
       <Group
