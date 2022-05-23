@@ -1,13 +1,13 @@
 /**
- * RP2040 FreeRTOS Template - App #3
+ * RP2040 FreeRTOS Template - App #2
  * Generic I2C functions
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.2.0
+ * @version   1.3.0
  * @licence   MIT
  *
  */
-#include "main.h"
+#include "i2c_utils.h"
 
 
 namespace I2C {

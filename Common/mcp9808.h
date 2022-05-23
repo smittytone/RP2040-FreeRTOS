@@ -3,12 +3,30 @@
  * MCP9808 I2C temperature sensor driver
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.2.0
+ * @version   1.3.0
  * @licence   MIT
  *
  */
 #ifndef _MCP9808_HEADER_
 #define _MCP9808_HEADER_
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <cstdint>
+#include <cstring>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
+// Pico SDK
+#include "pico/stdlib.h"            // Includes `hardware_gpio.h`
+#include "pico/binary_info.h"
+#include "hardware/i2c.h"
+// App
+#include "i2c_utils.h"
+#include "utils.h"
 
 
 /*
@@ -31,6 +49,10 @@
 #define MCP9808_CONFIG_ALRT_POL     0x02
 #define MCP9808_CONFIG_ALRT_MODE    0x01
 
+#define DEFAULT_TEMP_LOWER_LIMIT_C  10
+#define DEFAULT_TEMP_UPPER_LIMIT_C  25
+#define DEFAULT_TEMP_CRIT_LIMIT_C   50
+
 /**
     A very basic driver for the I2C-connected MCP9808 temperature sensor.
  */
@@ -43,14 +65,18 @@ class MCP9808 {
         bool        begin();
         double      read_temp();
         void        clear_alert(bool do_enable);
-        void        set_upper_limit(uint16_t upper_temp);
-        void        set_lower_limit(uint16_t lower_temp);
-        void        set_critical_limit(uint16_t critical_temp);
-        void        set_temp_limit(uint8_t register, uint16_t lower_temp);
+        void        set_upper_limit(uint16_t upper_temp = DEFAULT_TEMP_UPPER_LIMIT_C);
+        void        set_lower_limit(uint16_t lower_temp = DEFAULT_TEMP_LOWER_LIMIT_C);
+        void        set_critical_limit(uint16_t critical_temp = DEFAULT_TEMP_CRIT_LIMIT_C);
+        void        set_temp_limit(uint8_t temp_register, uint16_t temp);
+        
+        uint16_t    limit_critical;
+        uint16_t    limit_lower;
+        uint16_t    limit_upper;
     
     private:
         double      get_temp(uint8_t* data);
-        
+
         uint8_t     i2c_addr;
 };
 

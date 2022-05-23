@@ -3,12 +3,29 @@
  * Generic I2C functions
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.2.0
+ * @version   1.3.0
  * @licence   MIT
  *
  */
 #ifndef _I2C_HEADER_
 #define _I2C_HEADER_
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <cstdint>
+#include <cstring>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
+// Pico SDK
+#include "pico/stdlib.h"            // Includes `hardware_gpio.h`
+#include "pico/binary_info.h"
+#include "hardware/i2c.h"
+// App
+#include "utils.h"
 
 
 /*

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14)
 # NOTE Equivalent of `#define DEBUG 1`
 if(${DO_DEBUG})
     add_compile_definitions(DEBUG=1)
-    message(STATUS "App-side debugging set")
+    message(STATUS "App-side debugging enabled")
 else()
     message(STATUS "App-side debugging disabled")
 endif()

@@ -1,13 +1,13 @@
 /**
- * RP2040 FreeRTOS Template - App #3
+ * RP2040 FreeRTOS Template - App #2
  * HT16K33-based I2C 4-digit, 7-segment LED display driver
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.2.0
+ * @version   1.3.0
  * @licence   MIT
  *
  */
-#include "main.h"
+#include "ht16k33.h"
 
 using std::string;
 

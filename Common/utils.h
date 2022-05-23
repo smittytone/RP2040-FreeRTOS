@@ -3,12 +3,27 @@
  * General utility functions
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.2.0
+ * @version   1.3.0
  * @licence   MIT
  *
  */
 #ifndef _UTILS_HEADER_
 #define _UTILS_HEADER_
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <cstdint>
+#include <cstring>
+#include <sstream>
+#include <iomanip>
+#include <algorithm>
+// Pico SDK
+#include "pico/stdlib.h"
+#include "pico/binary_info.h"
+
 
 using std::vector;
 using std::string;

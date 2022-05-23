@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14)
 # NOTE Equivalent of `#define DEBUG 1`
 if(${DO_DEBUG})
     add_compile_definitions(DEBUG=1)
-    message(STATUS "App-side debugging set")
+    message(STATUS "App-side debugging enabled")
 else()
     message(STATUS "App-side debugging disabled")
 endif()
@@ -17,10 +17,10 @@ add_compile_definitions(BUILD_NUM=${BUILD_NUMBER})
 # Include app source code file(s)
 add_executable(${APP_3_NAME}
     ${APP_3_SRC_DIRECTORY}/main.cpp
-    ${APP_3_SRC_DIRECTORY}/ht16k33.cpp
-    ${APP_3_SRC_DIRECTORY}/i2c_utils.cpp
-    ${APP_3_SRC_DIRECTORY}/mcp9808.cpp
-    ${APP_3_SRC_DIRECTORY}/utils.cpp
+    ${COMMON_CODE_DIRECTORY}/ht16k33.cpp
+    ${COMMON_CODE_DIRECTORY}/i2c_utils.cpp
+    ${COMMON_CODE_DIRECTORY}/mcp9808.cpp
+    ${COMMON_CODE_DIRECTORY}/utils.cpp
 )
 
 # Link to built libraries

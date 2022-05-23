@@ -6,20 +6,23 @@ set(BUILD_NUMBER "1")
 
 # Set app name(s) and version(s)
 set(APP_1_NAME "TEMPLATE")
-set(APP_1_VERSION_NUMBER "1.2.0")
+set(APP_1_VERSION_NUMBER "1.3.0")
 
 set(APP_2_NAME "SCHEDULING_DEMO")
-set(APP_2_VERSION_NUMBER "1.2.0")
+set(APP_2_VERSION_NUMBER "1.3.0")
 
 set(APP_3_NAME "IRQS_DEMO")
-set(APP_3_VERSION_NUMBER "1.2.0")
+set(APP_3_VERSION_NUMBER "1.3.0")
 
 # Specify the app(s) source code
 set(APP_1_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Template")
 set(APP_2_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Scheduling")
 set(APP_3_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-IRQs")
 
-# Set app-side debugging ON or OFF
+# FROM 1.3.0 -- Move common source code to a separate directory
+set(COMMON_CODE_DIRECTORY "${CMAKE_SOURCE_DIR}/Common")
+
+# Set app-side debugging "ON" or "OFF"
 set(DO_DEBUG "ON")
 
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
@@ -68,8 +71,3 @@ target_include_directories(FreeRTOS PUBLIC
 add_subdirectory(${APP_1_SRC_DIRECTORY})
 add_subdirectory(${APP_2_SRC_DIRECTORY})
 add_subdirectory(${APP_3_SRC_DIRECTORY})
-
-# Clean up
-unset(FREERTOS_CFG_DIRECTORY)
-unset(FREERTOS_SRC_DIRECTORY)
-unset(APP_SRC_DIRECTORY)

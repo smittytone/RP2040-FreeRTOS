@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.2.0
+# RP2040-FreeRTOS Template 1.3.0
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -8,21 +8,31 @@ More details [in this blog post](https://blog.smittytone.net/2022/02/24/how-to-u
 
 ```
 /RP2040-FreeRTOS
+|
 |___/App-Template           // Application 1 (FreeRTOS template) source code
-    |___CMakeLists.txt      // Application-level CMake config file
+|   |___CMakeLists.txt      // Application-level CMake config file
+|
 |___/App-Scheduling         // Application 2 (scheduling demo) source code
-    |___CMakeLists.txt      // Application-level CMake config file
+|   |___CMakeLists.txt      // Application-level CMake config file
+|
 |___/App-IRQs               // Application 3 (IRQs demo) source code
-    |___CMakeLists.txt      // Application-level CMake config file
+|   |___CMakeLists.txt      // Application-level CMake config file
+|
+|___/Common                 // Source code common to all applications
+|
 |___/Config
-    |___FreeRTOSConfig.h    // FreeRTOS project config file
+|   |___FreeRTOSConfig.h    // FreeRTOS project config file
+|
 |___/FreeRTOS-Kernel        // FreeRTOS kernel files, included as a submodule
 |___/pico-sdk               // Raspberry Pi Pico SDK, included as a submodule
+|
 |___CMakeLists.txt          // Top-level project CMake config file
 |___pico_sdk_import.cmake   // Raspberry Pi Pico SDK CMake import script
 |___deploy.sh               // Build-and-deploy shell script
+|
 |___rp2040.code-workspace   // Visual Studio Code workspace
 |___rp2040.xcworkspace      // Xcode workspace
+|
 |___README.md
 |___LICENSE.md
 ```

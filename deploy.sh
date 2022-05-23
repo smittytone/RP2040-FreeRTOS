@@ -4,7 +4,7 @@
 # Deploy RP2040 application code
 #
 # @copyright 2022, Tony Smith @smittytone
-# @version   1.0.1
+# @version   1.0.2
 # @license   MIT
 #
 
@@ -19,8 +19,8 @@ show_help() {
     echo -e "Usage:\n"
     echo -e "  deploy [-b][-h] /path/to/compiled/uf2/file\n"
     echo -e "Options:\n"
-    echo "  -b / --build    Build the app first. Default: use a"
-    echo "                  pre-built version of the app" 
+    echo "  -b / --build    Build the app first."
+    echo "                  Default: use a pre-built version of the app"
     echo "  -h / --help     Show this help screen"
     echo
 }

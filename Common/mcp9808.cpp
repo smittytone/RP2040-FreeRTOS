@@ -3,11 +3,11 @@
  * MCP9808 I2C temperature sensor driver
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.2.0
+ * @version   1.3.0
  * @licence   MIT
  *
  */
-#include "main.h"
+#include "mcp9808.h"
 
 using std::string;
 
@@ -20,6 +20,11 @@ using std::string;
 MCP9808::MCP9808(uint32_t address) {
     if (address == 0x00 || address > 0xFF) address = MCP9808_I2CADDR_DEFAULT;
     i2c_addr = address;
+    
+    // Set defaults
+    limit_lower = DEFAULT_TEMP_LOWER_LIMIT_C;
+    limit_upper = DEFAULT_TEMP_UPPER_LIMIT_C;
+    limit_critical = DEFAULT_TEMP_CRIT_LIMIT_C;
 }
 
 
@@ -32,9 +37,9 @@ bool MCP9808::begin() {
     // Set up alerts threshold temperatures
     // NOTE You MUST set all three thresholds
     //      for the alert to operate.
-    set_lower_limit(TEMP_LOWER_LIMIT_C);
-    set_upper_limit(TEMP_UPPER_LIMIT_C);
-    set_critical_limit(TEMP_CRIT_LIMIT_C);
+    set_lower_limit(limit_lower);
+    set_upper_limit(limit_upper);
+    set_critical_limit(limit_critical);
     
     // Clear and enable the alert pin
     clear_alert(true);
@@ -118,6 +123,7 @@ void MCP9808::clear_alert(bool do_enable) {
  * @param upper_temp: The target temperature.
  */
 void MCP9808::set_upper_limit(uint16_t upper_temp) {
+    limit_upper = upper_temp;
     set_temp_limit(MCP9808_REG_UPPER_TEMP, upper_temp);
 }
 
@@ -128,6 +134,7 @@ void MCP9808::set_upper_limit(uint16_t upper_temp) {
  * @param critical_temp: The target temperature.
  */
 void MCP9808::set_critical_limit(uint16_t critical_temp) {
+    limit_critical = critical_temp;
     set_temp_limit(MCP9808_REG_CRIT_TEMP, critical_temp);
 }
 
@@ -138,6 +145,7 @@ void MCP9808::set_critical_limit(uint16_t critical_temp) {
  * @param lower_temp: The target temperature.
  */
 void MCP9808::set_lower_limit(uint16_t lower_temp) {
+    limit_lower = lower_temp;
     set_temp_limit(MCP9808_REG_LOWER_TEMP, lower_temp);
 }
 

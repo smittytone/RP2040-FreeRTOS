@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #2
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.2.0
+ * @version   1.3.0
  * @licence   MIT
  *
  */
@@ -29,10 +29,10 @@
 #include "pico/binary_info.h"
 #include "hardware/i2c.h"
 // App
-#include "i2c_utils.h"
-#include "ht16k33.h"
-#include "mcp9808.h"
-#include "utils.h"
+#include "../Common/i2c_utils.h"
+#include "../Common/ht16k33.h"
+#include "../Common/mcp9808.h"
+#include "../Common/utils.h"
 
 
 #ifdef __cplusplus
@@ -66,8 +66,6 @@ void display_tmp(double value);
 
 void log_debug(const char* msg);
 void log_device_info(void);
-
-
 
 
 #ifdef __cplusplus
