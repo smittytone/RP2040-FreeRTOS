@@ -2,12 +2,12 @@
  * RP2040 FreeRTOS Template
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @license   MIT
  *
  */
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef MAIN_H
+#define MAIN_H
 
 
 // FreeRTOS
@@ -50,4 +50,4 @@ void log_device_info(void);
 #endif
 
 
-#endif      // _MAIN_H_
+#endif      // MAIN_H

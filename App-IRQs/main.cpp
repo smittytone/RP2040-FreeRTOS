@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #3
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
@@ -216,7 +216,7 @@ void task_led_pico(void* unused_arg) {
 
             if (state) {
                 #ifdef DEBUG
-                log_debug("PICO LED FLASH");
+                Utils::log_debug("PICO LED FLASH");
                 #endif
                 
                 led_on();
@@ -256,7 +256,7 @@ void task_led_gpio(void* unused_arg) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
             #ifdef DEBUG
-            if (passed_value_buffer == LED_ON) log_debug("GPIO LED FLASH");
+            if (passed_value_buffer == LED_ON) Utils::log_debug("GPIO LED FLASH");
             #endif
             
             gpio_put(RED_LED_PIN, passed_value_buffer);
@@ -295,7 +295,7 @@ void task_sensor_alrt(void* unused_arg) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         
         #ifdef DEBUG
-        log_debug("IRQ detected");
+        Utils::log_debug("IRQ detected");
         #endif
 
         // Show the IRQ was hit
@@ -311,7 +311,7 @@ void task_sensor_alrt(void* unused_arg) {
         // Wait for event: is there a semaphore?
         if (xSemaphoreTake(semaphore_irq, portMAX_DELAY) == pdPASS) {
              #ifdef DEBUG
-             log_debug("IRQ detected");
+             Utils::log_debug("IRQ detected");
              #endif
 
              // Show the IRQ was hit
@@ -333,7 +333,7 @@ void task_sensor_alrt(void* unused_arg) {
         if (xQueueReceive(irq_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
             if (passed_value_buffer == 1) {
                 #ifdef DEBUG
-                log_debug("IRQ detected");
+                Utils::log_debug("IRQ detected");
                 #endif
                 
                 // Show the IRQ was hit
@@ -355,7 +355,7 @@ void task_sensor_alrt(void* unused_arg) {
  */
 void timer_fired_callback(TimerHandle_t timer) {
     #ifdef DEBUG
-    log_debug("Timer fired");
+    Utils::log_debug("Timer fired");
     #endif
     
     if (read_temp < (double)TEMP_UPPER_LIMIT_C) {
@@ -441,28 +441,6 @@ void display_tmp(double value) {
 }
 
 
-/**
- * @brief Generate and print a debug message from a supplied string.
- *
- * @param msg: The base message to which `[DEBUG]` will be prefixed.
- */
-void log_debug(const char* msg) {
-    uint msg_length = 9 + strlen(msg);
-    char* sprintf_buffer = (char *)malloc(msg_length);
-    sprintf(sprintf_buffer, "[DEBUG] %s\n", msg);
-    printf("%s", sprintf_buffer);
-    free(sprintf_buffer);
-}
-
-
-/**
- * @brief Show basic device info.
- */
-void log_device_info(void) {
-    printf("App: %s %s\nBuild: %i\n", APP_NAME, APP_VERSION, BUILD_NUM);
-}
-
-
 /*
  * RUNTIME START
  */
@@ -481,7 +459,7 @@ int main() {
     
     // Log app info
     #ifdef DEBUG
-    log_device_info();
+    Utils::log_device_info();
     #endif
     
     // Set up four tasks

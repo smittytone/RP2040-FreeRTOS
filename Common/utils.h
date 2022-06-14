@@ -3,12 +3,12 @@
  * General utility functions
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
-#ifndef _UTILS_HEADER_
-#define _UTILS_HEADER_
+#ifndef UTILS_HEADER
+#define UTILS_HEADER
 
 
 #include <iostream>
@@ -39,7 +39,9 @@ namespace Utils {
     string          get_field_value(string line, uint32_t field_number);
     string          uppercase(string base);
     uint32_t        bcd(uint32_t base);
+    void            log_device_info(void);
+    void            log_debug(const string msg);
 }
 
 
-#endif // _UTILS_HEADER_
+#endif // UTILS_HEADER

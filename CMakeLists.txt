@@ -2,22 +2,26 @@ cmake_minimum_required(VERSION 3.14)
 
 # Set project data
 set(PROJECT_NAME "RP2040_FREERTOS_PROJECT")
-set(BUILD_NUMBER "1")
+set(BUILD_NUMBER "0")
 
 # Set app name(s) and version(s)
 set(APP_1_NAME "TEMPLATE")
-set(APP_1_VERSION_NUMBER "1.3.0")
+set(APP_1_VERSION_NUMBER "1.4.0")
 
 set(APP_2_NAME "SCHEDULING_DEMO")
-set(APP_2_VERSION_NUMBER "1.3.0")
+set(APP_2_VERSION_NUMBER "1.4.0")
 
 set(APP_3_NAME "IRQS_DEMO")
-set(APP_3_VERSION_NUMBER "1.3.0")
+set(APP_3_VERSION_NUMBER "1.4.0")
+
+set(APP_4_NAME "TIMERS_DEMO")
+set(APP_4_VERSION_NUMBER "1.4.0")
 
 # Specify the app(s) source code
 set(APP_1_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Template")
 set(APP_2_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Scheduling")
 set(APP_3_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-IRQs")
+set(APP_4_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Timers")
 
 # FROM 1.3.0 -- Move common source code to a separate directory
 set(COMMON_CODE_DIRECTORY "${CMAKE_SOURCE_DIR}/Common")
@@ -71,3 +75,4 @@ target_include_directories(FreeRTOS PUBLIC
 add_subdirectory(${APP_1_SRC_DIRECTORY})
 add_subdirectory(${APP_2_SRC_DIRECTORY})
 add_subdirectory(${APP_3_SRC_DIRECTORY})
+add_subdirectory(${APP_4_SRC_DIRECTORY})

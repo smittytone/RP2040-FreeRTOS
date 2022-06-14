@@ -2,12 +2,12 @@
  * RP2040 FreeRTOS Template - App #3
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef MAIN_H
+#define MAIN_H
 
 
 // FreeRTOS
@@ -84,9 +84,6 @@ void task_sensor_alrt(void* unused_arg);
 void display_int(int number);
 void display_tmp(double value);
 
-void log_debug(const char* msg);
-void log_device_info(void);
-
 void timer_fired_callback(TimerHandle_t timer);
 void set_alert_timer();
 
@@ -96,4 +93,4 @@ void set_alert_timer();
 #endif
 
 
-#endif      // _MAIN_H_
+#endif      // MAIN_H

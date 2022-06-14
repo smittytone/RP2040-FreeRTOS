@@ -3,7 +3,7 @@
  * General utility functions
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
@@ -120,6 +120,24 @@ string uppercase(string base) {
     std::transform(base.begin(), base.end(), base.begin(), ::toupper);
     //printf("%s -> %s\n", base.c_str(), result.c_str());
     return base;
+}
+
+
+/**
+ * @brief Output basic device info.
+ */
+void log_device_info(void) {
+    printf("App: %s %s (%i)\n", APP_NAME, APP_VERSION, BUILD_NUM);
+}
+
+
+/**
+ * @brief Generate and print a debug message from a supplied string.
+ *
+ * @param msg: The base message to which `[DEBUG]` will be prefixed.
+ */
+void log_debug(const string msg) {
+    printf("[DEBUG] %s\n", msg.c_str());
 }
 
 

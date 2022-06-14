@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #2
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
@@ -92,6 +92,19 @@ void setup_i2c() {
 
 
 /*
+ * GENERAL SETUP
+ */
+
+/**
+ * @brief Umbrella hardware setup routine.
+ */
+void setup() {
+    setup_i2c();
+    setup_led();
+}
+
+
+/*
  * TASKS
  */
 
@@ -108,7 +121,7 @@ void led_task_pico(void* unused_arg) {
     
     // Log app info
     #ifdef DEBUG
-    log_device_info();
+    Utils::log_device_info();
     #endif
     
     // Start the task loop
@@ -120,7 +133,7 @@ void led_task_pico(void* unused_arg) {
             then = now;
         
             if (state) {
-                log_debug("PICO LED FLASH");
+                Utils::log_debug("PICO LED FLASH");
                 led_on();
                 pico_led_state = 1;
                 xQueueSendToBack(queue, &pico_led_state, 0);
@@ -163,7 +176,7 @@ void led_task_gpio(void* unused_arg) {
         if (xQueueReceive(queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
-            if (passed_value_buffer) log_debug("GPIO LED FLASH");
+            if (passed_value_buffer) Utils::log_debug("GPIO LED FLASH");
             gpio_put(RED_LED_PIN, passed_value_buffer == 1 ? 0 : 1);
         }
         
@@ -232,37 +245,6 @@ void display_tmp(double value) {
 
     // Add a final 'c' and update the display
     display.set_alpha('c', 3).draw();
-}
-
-
-/**
- * @brief Generate and print a debug message from a supplied string.
- *
- * @param msg: The base message to which `[DEBUG]` will be prefixed.
- */
-void log_debug(const char* msg) {
-    uint msg_length = 9 + strlen(msg);
-    char* sprintf_buffer = (char *)malloc(msg_length);
-    sprintf(sprintf_buffer, "[DEBUG] %s\n", msg);
-    printf("%s", sprintf_buffer);
-    free(sprintf_buffer);
-}
-
-
-/**
- * @brief Show basic device info.
- */
-void log_device_info(void) {
-    printf("App: %s %s\nBuild: %i\n", APP_NAME, APP_VERSION, BUILD_NUM);
-}
-
-
-/**
- * @brief Umbrella hardware setup routine.
- */
-void setup() {
-    setup_i2c();
-    setup_led();
 }
 
 

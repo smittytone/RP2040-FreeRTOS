@@ -3,12 +3,12 @@
  * HT16K33-based I2C 4-digit, 7-segment LED display driver
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
-#ifndef _HT16K33_HEADER_
-#define _HT16K33_HEADER_
+#ifndef HT16K33_HEADER
+#define HT16K33_HEADER
 
 
 #include <iostream>
@@ -75,4 +75,4 @@ class HT16K33_Segment {
 };
 
 
-#endif  // _HT16K33_HEADER_
+#endif  // HT16K33_HEADER

@@ -44,6 +44,19 @@
          </FileRef>
       </Group>
       <Group
+         location = "group:App-Timers"
+         name = "App-Timers">
+         <FileRef
+            location = "group:CMakeLists.txt">
+         </FileRef>
+         <FileRef
+            location = "group:main.h">
+         </FileRef>
+         <FileRef
+            location = "group:main.cpp">
+         </FileRef>
+      </Group>
+      <Group
          location = "group:Common"
          name = "Common">
          <FileRef

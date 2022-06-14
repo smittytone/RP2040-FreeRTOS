@@ -4,7 +4,7 @@
 # Deploy RP2040 application code
 #
 # @copyright 2022, Tony Smith @smittytone
-# @version   1.0.2
+# @version   1.1.0
 # @license   MIT
 #
 
@@ -13,6 +13,9 @@ timeout=30
 do_build=0
 rpi_path="/Volumes/RPI-RP2"
 uf2_path="UNDEFINED"
+cmake_path="$PWD/CMakeLists.txt"
+
+set -e
 
 # FUNCTIONS
 show_help() {
@@ -23,6 +26,21 @@ show_help() {
     echo "                  Default: use a pre-built version of the app"
     echo "  -h / --help     Show this help screen"
     echo
+}
+
+update_build_number() {
+    build_val=$(grep 'set(BUILD_NUMBER "' ${cmake_path})
+    old_num=$(echo "${build_val}" | cut -d '"' -s -f 2)
+    ((new_num=old_num+1))
+
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sed -i "s|BUILD_NUMBER \"${old_num}\"|BUILD_NUMBER \"${new_num}\"|" "${cmake_path}"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS requires slightly different syntax from Unix
+        sed -i '' "s|BUILD_NUMBER \"${old_num}\"|BUILD_NUMBER \"${new_num}\"|" "${cmake_path}"
+    else
+        echo "[ERROR] Unknown OS... build number not incremented"
+    fi
 }
 
 # RUNTIME START
@@ -53,6 +71,9 @@ fi
 # Do we build first?
 err=0
 if [[ ${do_build} -eq 1 ]]; then
+    # FROM 1.1.0 -- auto-update the build number
+    update_build_number
+    
     if [[ ! -e "./build" ]]; then
         # No build folder? Then create it
         # and configure the build
@@ -72,9 +93,9 @@ fi
 
 # Wait for the RPI_R2 mount
 count=0
-if [ ! -e "${rpi_path}" ]; then
+if [ ! -d "${rpi_path}" ]; then
     echo "Waiting for RP2040 device to mount"
-    while [ ! -e "${rpi_path}" ]; do
+    while [ ! -d "${rpi_path}" ]; do
         sleep 1
         ((count+=1))
         if [[ $count -eq $timeout ]]; then
@@ -87,15 +108,15 @@ fi
 echo "RP2040 device mounted..."
 
 # Check for available app file
-if [ ! -e "${uf2_path}" ]; then
+if [ ! -f "${uf2_path}" ]; then
     echo "[ERROR] Cannot find file ${uf2_path}... exiting"
     exit 1
 fi
 
-echo "Copying ${uf2_path##*/} to ${rpi_path}/${uf2_path##*/}"
+echo "Copying ${uf2_path} to ${rpi_path}/${uf2_path##*/}"
 
 # Copy file
-if cp "${uf2_path}" "${rpi_path}"; then
+if cp -f "${uf2_path}" "${rpi_path}/${uf2_path##*/}"; then
     echo "${uf2_path##*/} copied to ${rpi_path}"
 else
     echo "[ERROR] Could not copy ${uf2_path##*/} to ${rpi_path}/${uf2_path##*/}"

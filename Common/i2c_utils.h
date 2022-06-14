@@ -3,12 +3,12 @@
  * Generic I2C functions
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
-#ifndef _I2C_HEADER_
-#define _I2C_HEADER_
+#ifndef I2C_UTILS_HEADER
+#define I2C_UTILS_HEADER
 
 
 #include <iostream>
@@ -49,4 +49,4 @@ namespace I2C {
 }
 
 
-#endif  // _I2C_HEADER_
+#endif  // I2C_UTILS_HEADER

@@ -3,12 +3,12 @@
  * MCP9808 I2C temperature sensor driver
  * 
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.3.0
+ * @version   1.4.0
  * @licence   MIT
  *
  */
-#ifndef _MCP9808_HEADER_
-#define _MCP9808_HEADER_
+#ifndef MCP9808_HEADER
+#define MCP9808_HEADER
 
 
 #include <iostream>
@@ -81,4 +81,4 @@ class MCP9808 {
 };
 
 
-#endif // _MCP9808_HEADER_
+#endif // MCP9808_HEADER
