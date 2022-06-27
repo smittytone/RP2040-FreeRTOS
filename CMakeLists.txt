@@ -6,16 +6,16 @@ set(BUILD_NUMBER "0")
 
 # Set app name(s) and version(s)
 set(APP_1_NAME "TEMPLATE")
-set(APP_1_VERSION_NUMBER "1.4.0")
+set(APP_1_VERSION_NUMBER "1.4.1")
 
 set(APP_2_NAME "SCHEDULING_DEMO")
-set(APP_2_VERSION_NUMBER "1.4.0")
+set(APP_2_VERSION_NUMBER "1.4.1")
 
 set(APP_3_NAME "IRQS_DEMO")
-set(APP_3_VERSION_NUMBER "1.4.0")
+set(APP_3_VERSION_NUMBER "1.4.1")
 
 set(APP_4_NAME "TIMERS_DEMO")
-set(APP_4_VERSION_NUMBER "1.4.0")
+set(APP_4_VERSION_NUMBER "1.4.1")
 
 # Specify the app(s) source code
 set(APP_1_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Template")

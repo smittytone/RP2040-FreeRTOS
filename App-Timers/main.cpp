@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #4
  *
  * @copyright 2022, Tony Smith (@smittytone)
- * @version   1.4.0
+ * @version   1.4.1
  * @licence   MIT
  *
  */
@@ -116,6 +116,10 @@ void timer_fired_callback(TimerHandle_t timer) {
     } else {
         // The LED OFF timer fired so turn the LED off
         led_off();
+        
+        // FROM 1.4.1 -- Kill the timer to prevent OOM panics
+        //               Thanks, @hepoun!
+        xTimerDelete(timer, 0);
     }
 }
 
