@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 # Set project data
 set(PROJECT_NAME "RP2040_FREERTOS_PROJECT")
-set(BUILD_NUMBER "0")
+set(BUILD_NUMBER "1")
 
 # Set app name(s) and version(s)
 set(APP_1_NAME "TEMPLATE")
@@ -75,3 +75,11 @@ add_subdirectory(${APP_1_SRC_DIRECTORY})
 add_subdirectory(${APP_2_SRC_DIRECTORY})
 add_subdirectory(${APP_3_SRC_DIRECTORY})
 add_subdirectory(${APP_4_SRC_DIRECTORY})
+
+# FROM 1.4.2 -- Post increment build number
+add_custom_command(OUTPUT INCREMENT_BUILD
+    COMMAND python3 ../scripts/increment.py
+)
+
+add_custom_target(do_increment ALL DEPENDS INCREMENT_BUILD)
+

@@ -1,126 +1,80 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
+# Deploy compiled firmare to RP2040-based board
+# as a cli2c USB-to-I2C hardware bridge
 #
-# Deploy RP2040 application code
+# Usage:
+#   ./deploy.sh {path/to/device} {path/to/uf2}
 #
-# @copyright 2022, Tony Smith @smittytone
-# @version   1.1.0
-# @license   MIT
-#
+# Examples:
+#   macOS: ./deploy.sh /dev/cu.usbmodem1.1 /build/App-IRQs/IRQS_DEMO.uf2
+#   Linux RPiOS: ./deploy.sh /dev/ttyACMO /build/App-IRQs/IRQS_DEMO.uf2
 
-# GLOBALS
-timeout=30
-do_build=0
-rpi_path="/Volumes/RPI-RP2"
-uf2_path="UNDEFINED"
-cmake_path="$PWD/CMakeLists.txt"
-
-set -e
-
-# FUNCTIONS
-show_help() {
-    echo -e "Usage:\n"
-    echo -e "  deploy [-b][-h] /path/to/compiled/uf2/file\n"
-    echo -e "Options:\n"
-    echo "  -b / --build    Build the app first."
-    echo "                  Default: use a pre-built version of the app"
-    echo "  -h / --help     Show this help screen"
-    echo
+show_error_and_exit() {
+    echo "[ERROR] $1"
+    exit 1
 }
 
-update_build_number() {
-    build_val=$(grep 'set(BUILD_NUMBER "' ${cmake_path})
-    old_num=$(echo "${build_val}" | cut -d '"' -s -f 2)
-    ((new_num=old_num+1))
-
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        sed -i "s|BUILD_NUMBER \"${old_num}\"|BUILD_NUMBER \"${new_num}\"|" "${cmake_path}"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS requires slightly different syntax from Unix
-        sed -i '' "s|BUILD_NUMBER \"${old_num}\"|BUILD_NUMBER \"${new_num}\"|" "${cmake_path}"
-    else
-        echo "[ERROR] Unknown OS... build number not incremented"
-    fi
-}
-
-# RUNTIME START
-for arg in "$@"; do
-    check_arg=${arg,,}
-    if [[ "$check_arg" = "--help" || "$check_arg" = "-h" ]]; then
-        show_help
-        exit 0
-    elif [[ "$check_arg" = "--build" || "$check_arg" = "-b" ]]; then
-        do_build=1
-    else
-        uf2_path="$arg"
-    fi
-done
-
-if [[ "${uf2_path}" == "UNDEFINED" ]]; then
-    show_help
+if [[ -z ${1} ]]; then
+    echo "Usage: deploy.sh {path/to/device} {path/to/uf2}"
     exit 0
 fi
 
-# Check we have what looks like a UF2
-extension="${uf2_path##*.}"
-if [[ "${extension}" != "uf2" ]]; then
-    echo "[ERROR] ${uf2_path} does not indicate a .uf2 file"
+if [[ -z ${2} || ${2##*.} != "uf2" ]]; then
+    echo "[ERROR] No .uf2 file specified"
     exit 1
 fi
 
-# Do we build first?
-err=0
-if [[ ${do_build} -eq 1 ]]; then
-    # FROM 1.1.0 -- auto-update the build number
-    update_build_number
-    
-    if [[ ! -e "./build" ]]; then
-        # No build folder? Then create it
-        # and configure the build
-        cmake -S . -B build/ -D "CMAKE_C_COMPILER:FILEPATH=$(which arm-none-eabi-gcc)" -D CMAKE_BUILD_TYPE:STRING=Release
-        err=$?
-    fi
-    
-    # Build the app
-    cmake --build build
-    err=$?
-fi
-
-# Check for errors
-if [[ ${err} -ne 0 ]]; then
+if [[ ! -f ${2} ]]; then
+    echo "[ERROR] ${2} cannot be found"
     exit 1
 fi
 
-# Wait for the RPI_R2 mount
-count=0
-if [ ! -d "${rpi_path}" ]; then
-    echo "Waiting for RP2040 device to mount"
-    while [ ! -d "${rpi_path}" ]; do
-        sleep 1
-        ((count+=1))
-        if [[ $count -eq $timeout ]]; then
-            echo "[ERROR] RP2040 device not mounted after ${timeout}s... exiting"
-            exit 1
-        fi
-    done
-fi
-
-echo "RP2040 device mounted..."
-
-# Check for available app file
-if [ ! -f "${uf2_path}" ]; then
-    echo "[ERROR] Cannot find file ${uf2_path}... exiting"
-    exit 1
-fi
-
-echo "Copying ${uf2_path} to ${rpi_path}/${uf2_path##*/}"
-
-# Copy file
-if cp -f "${uf2_path}" "${rpi_path}/${uf2_path##*/}"; then
-    echo "${uf2_path##*/} copied to ${rpi_path}"
+# Put the Pico onto BOOTSEL mode
+platform=$(uname)
+if [[ ${platform} = Darwin ]]; then
+    # macOS mount path
+    pico_path=/Volumes/RPI-RP2
+    stty -f ${1} 1200 || show_error_and_exit "Could not connect to device ${1}"
 else
-    echo "[ERROR] Could not copy ${uf2_path##*/} to ${rpi_path}/${uf2_path##*/}"
-    exit 1
+    # NOTE This is for Raspberry Pi -- you may need to change it
+    #      depending on how you or your OS locate USB drive mount points
+    pico_path="/media/$USER/RPI-RP2"
+    stty -F ${1} 1200 || show_error_and_exit "Could not connect to device ${1}"
+
+    # Allow for command line usage -- ie. not in a GUI terminal
+    # Command line is SHLVL 1, so script is SHLVL 2 (under the GUI we'd be a SHLVL 3)
+    if [[ $SHLVL -eq 2 ]]; then
+        # Mount the disk, but allow time for it to appear (not immediate on RPi)
+        sleep 5
+        rp2_disk=$(sudo fdisk -l | grep FAT16 | cut -f 1 -d ' ')
+        if [[ -z ${rp2_disk} ]]; then
+            show_error_and_exit "Could not see device ${1}"
+        fi
+
+        sudo mkdir ${pico_path} || show_error_and_exit "Could not make mount point ${pico_path}"
+        sudo mount ${rp2_disk} ${pico_path} -o rw || show_error_and_exit "Could not mount device ${1}"
+    fi
 fi
 
-exit 0
+echo "Waiting for Pico to mount..."
+count=0
+while [ ! -d ${pico_path} ]; do
+    sleep 0.1
+    ((count+=1))
+    [[ ${count} -eq 200 ]] && show_error_and_exit "Pico mount timed out"
+done
+sleep 0.5
+
+# Copy the target file
+echo "Copying ${2} to ${1}..."
+if [[ ${platform} = Darwin ]]; then
+    cp ${2} ${pico_path}
+else
+    sudo cp ${2} ${pico_path}
+    if [[ $SHLVL -eq 2 ]]; then
+        # We're at the command line, so unmount (RPi GUI does this automatically)
+        sudo umount ${rp2_disk} && echo "Pico unmounted" && sudo rm -rf ${pico_path} && echo "Mountpoint removed"
+    fi
+fi
+echo Done
