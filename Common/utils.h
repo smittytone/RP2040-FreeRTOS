@@ -3,7 +3,7 @@
  * General utility functions
  *
  * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.1
+ * @version   1.4.2
  * @licence   MIT
  *
  */
