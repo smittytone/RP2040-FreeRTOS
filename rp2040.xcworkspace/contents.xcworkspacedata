@@ -91,13 +91,6 @@
             location = "group:FreeRTOSConfig.h">
          </FileRef>
       </Group>
-      <Group
-         location = "group:Scripts"
-         name = "Scripts">
-         <FileRef
-            location = "group:increment.py">
-         </FileRef>
-      </Group>
       <FileRef
          location = "group:CMakeLists.txt">
       </FileRef>

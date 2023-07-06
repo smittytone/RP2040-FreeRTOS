@@ -75,11 +75,3 @@ add_subdirectory(${APP_1_SRC_DIRECTORY})
 add_subdirectory(${APP_2_SRC_DIRECTORY})
 add_subdirectory(${APP_3_SRC_DIRECTORY})
 add_subdirectory(${APP_4_SRC_DIRECTORY})
-
-# FROM 1.4.2 -- Post increment build number
-add_custom_command(OUTPUT INCREMENT_BUILD
-    COMMAND python3 ../Scripts/increment.py
-)
-
-add_custom_target(do_increment ALL DEPENDS INCREMENT_BUILD)
-

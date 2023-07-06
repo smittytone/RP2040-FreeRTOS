@@ -106,7 +106,7 @@ void log_debug(const char* msg) {
  */
 void log_device_info(void) {
 
-    printf("  App: %s %s\nBuild: %i\n", APP_NAME, APP_VERSION, BUILD_NUM);
+    printf("App: %s %s (%i)\n", APP_NAME, APP_VERSION, BUILD_NUM);
 }
 
 

@@ -122,9 +122,7 @@ uint32_t bcd(uint32_t base) {
  */
 string uppercase(string base) {
 
-    //string result;
     std::transform(base.begin(), base.end(), base.begin(), ::toupper);
-    //printf("%s -> %s\n", base.c_str(), result.c_str());
     return base;
 }
 
