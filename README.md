@@ -58,10 +58,10 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
         * `./deploy.sh build/App-Template/TEMPLATE.uf2`.
         * `./deploy.sh build/App-Scheduling/SCHEDULING_DEMO.uf2`.
     * To trigger a build, include the `--build` or `-b` flag: `./deploy.sh -b`.
-    
+
 ## Debug vs Release
 
-You can switch between build types when you make the `cmake` call in step 5, above. A debug build is made by default, but you can make this explicit with
+You can switch between build types when you make the `cmake` call in step 5, above. A debug build is made explicit with:
 
 ```shell
 cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug
