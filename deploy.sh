@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# Deploy compiled firmare to RP2040-based board
-# as a cli2c USB-to-I2C hardware bridge
+# Deploy compiled firmware to RP2040-based board
 #
 # Usage:
 #   ./deploy.sh {path/to/device} {path/to/uf2}
 #
 # Examples:
-#   macOS: ./deploy.sh /dev/cu.usbmodem1.1 /build/App-IRQs/IRQS_DEMO.uf2
-#   Linux RPiOS: ./deploy.sh /dev/ttyACMO /build/App-IRQs/IRQS_DEMO.uf2
+#   macOS:       ./deploy.sh /dev/cu.usbmodem1.1 /build/App-IRQs/IRQS_DEMO.uf2
+#   Linux RPiOS: ./deploy.sh /dev/ttyACMO        /build/App-IRQs/IRQS_DEMO.uf2
 
 show_error_and_exit() {
     echo "[ERROR] $1"
