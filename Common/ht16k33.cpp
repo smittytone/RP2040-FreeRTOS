@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #2
  * HT16K33-based I2C 4-digit, 7-segment LED display driver
  *
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *
@@ -30,6 +30,7 @@ const uint32_t POS[4] = {0, 2, 6, 8};
  * @param address: The display's I2C address. Default: 0x70.
  */
 HT16K33_Segment::HT16K33_Segment(uint32_t address) {
+
     if (address == 0x00 || address > 0xFF) address = HT16K33_ADDRESS;
     i2c_addr = address;
 }
@@ -40,6 +41,7 @@ HT16K33_Segment::HT16K33_Segment(uint32_t address) {
  *        and set basic parameters.
  */
 void HT16K33_Segment::init() {
+
     power_on(true);
     set_brightness(2);
     clear();
@@ -54,6 +56,7 @@ void HT16K33_Segment::init() {
               Default: `true`.
  */
 void HT16K33_Segment::power_on(bool on) {
+
     I2C::write_byte(i2c_addr, on ? HT16K33_GENERIC_SYSTEM_ON : HT16K33_GENERIC_DISPLAY_OFF);
     I2C::write_byte(i2c_addr, on ? HT16K33_GENERIC_DISPLAY_ON : HT16K33_GENERIC_SYSTEM_OFF);
 }
@@ -65,6 +68,7 @@ void HT16K33_Segment::power_on(bool on) {
  * @param brightness: A value from 0 to 15. Default: 15.
  */
 void HT16K33_Segment::set_brightness(uint32_t brightness) {
+
     if (brightness < 0 || brightness > 15) brightness = 15;
     I2C::write_byte(i2c_addr, HT16K33_GENERIC_CMD_BRIGHTNESS | brightness);
 }
@@ -76,6 +80,7 @@ void HT16K33_Segment::set_brightness(uint32_t brightness) {
  * @retval The instance.
  */
 HT16K33_Segment& HT16K33_Segment::clear() {
+
     for (uint32_t i = 0 ; i < 16 ; ++i) buffer[i] = 0;
     return *this;
 }
@@ -88,6 +93,7 @@ HT16K33_Segment& HT16K33_Segment::clear() {
  * @retval The instance.
  */
 HT16K33_Segment& HT16K33_Segment::set_colon(bool is_set) {
+
     buffer[HT16K33_SEGMENT_COLON_ROW] = is_set ? 0x02 : 0x00;
     return *this;
 }
@@ -104,6 +110,7 @@ HT16K33_Segment& HT16K33_Segment::set_colon(bool is_set) {
  * @retval The instance.
  */
 HT16K33_Segment& HT16K33_Segment::set_glyph(uint32_t glyph, uint32_t digit, bool has_dot) {
+
     if (digit > 4) return *this;
     if (glyph > 0xFF) return *this;
     buffer[POS[digit]] = glyph;
@@ -123,6 +130,7 @@ HT16K33_Segment& HT16K33_Segment::set_glyph(uint32_t glyph, uint32_t digit, bool
  * @retval The instance.
  */
 HT16K33_Segment& HT16K33_Segment::set_number(uint32_t number, uint32_t digit, bool has_dot) {
+
     if (digit > 4) return *this;
     if (number > 9) return *this;
     return set_alpha('0' + number, digit, has_dot);
@@ -140,6 +148,7 @@ HT16K33_Segment& HT16K33_Segment::set_number(uint32_t number, uint32_t digit, bo
  * @retval The instance.
  */
 HT16K33_Segment& HT16K33_Segment::set_alpha(char chr, uint32_t digit, bool has_dot) {
+
     if (digit > 4) return *this;
 
     uint8_t char_val = 0xFF;
@@ -166,6 +175,7 @@ HT16K33_Segment& HT16K33_Segment::set_alpha(char chr, uint32_t digit, bool has_d
  * @brief Write the display buffer out to I2C.
  */
 void HT16K33_Segment::draw() {
+
     // Set up the buffer holding the data to be
     // transmitted to the LED
     uint8_t tx_buffer[17];

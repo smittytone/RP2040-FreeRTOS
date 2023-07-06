@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #2
  * Generic I2C functions
  *
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *
@@ -18,6 +18,7 @@ namespace I2C {
  * Takes values from #defines set in `i2c_utils.h`
  */
 void setup() {
+
     i2c_init(I2C_PORT, I2C_FREQUENCY);
     gpio_set_function(SDA_GPIO, GPIO_FUNC_I2C);
     gpio_set_function(SCL_GPIO, GPIO_FUNC_I2C);
@@ -32,6 +33,7 @@ void setup() {
  * @param byte:    The byte to send.
  */
 void write_byte(uint8_t address, uint8_t byte) {
+
     i2c_write_blocking(I2C_PORT, address, &byte, 1, false);
 }
 
@@ -43,6 +45,7 @@ void write_byte(uint8_t address, uint8_t byte) {
  * @param count:   The number of bytes to send.
  */
 void write_block(uint8_t address, uint8_t *data, uint8_t count) {
+
     i2c_write_blocking(I2C_PORT, address, data, count, false);
 }
 
@@ -54,6 +57,7 @@ void write_block(uint8_t address, uint8_t *data, uint8_t count) {
  * @param count:   The number of bytes to read.
  */
 void read_block(uint8_t address, uint8_t *data, uint8_t count) {
+
     i2c_read_blocking(I2C_PORT, address, data, count, false);
 }
 

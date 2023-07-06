@@ -6,16 +6,16 @@ set(BUILD_NUMBER "0")
 
 # Set app name(s) and version(s)
 set(APP_1_NAME "TEMPLATE")
-set(APP_1_VERSION_NUMBER "1.4.1")
+set(APP_1_VERSION_NUMBER "1.4.2")
 
 set(APP_2_NAME "SCHEDULING_DEMO")
-set(APP_2_VERSION_NUMBER "1.4.1")
+set(APP_2_VERSION_NUMBER "1.4.2")
 
 set(APP_3_NAME "IRQS_DEMO")
-set(APP_3_VERSION_NUMBER "1.4.1")
+set(APP_3_VERSION_NUMBER "1.4.2")
 
 set(APP_4_NAME "TIMERS_DEMO")
-set(APP_4_VERSION_NUMBER "1.4.1")
+set(APP_4_VERSION_NUMBER "1.4.2")
 
 # Specify the app(s) source code
 set(APP_1_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Template")
@@ -26,8 +26,9 @@ set(APP_4_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/App-Timers")
 # FROM 1.3.0 -- Move common source code to a separate directory
 set(COMMON_CODE_DIRECTORY "${CMAKE_SOURCE_DIR}/Common")
 
-# Set app-side debugging "ON" or "OFF"
-set(DO_DEBUG "ON")
+# FROM 1.4.2 -- Set app-side debugging on debug builds
+# Now uses CMake generator expression to extract config type
+add_compile_definitions($<$<CONFIG:Debug>:DEBUG=1>)
 
 # Set env variable 'PICO_SDK_PATH' to the local Pico SDK
 # Comment out the set() if you have a global copy of the
@@ -35,8 +36,6 @@ set(DO_DEBUG "ON")
 set(ENV{PICO_SDK_PATH} "${CMAKE_SOURCE_DIR}/pico-sdk")
 
 # Set flags and directory variables
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DTSDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DTSDEBUG")
 set(FREERTOS_CFG_DIRECTORY "${CMAKE_SOURCE_DIR}/Config")
 set(FREERTOS_SRC_DIRECTORY "${CMAKE_SOURCE_DIR}/FreeRTOS-Kernel")
 

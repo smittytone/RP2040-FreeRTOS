@@ -1,7 +1,7 @@
 /**
  * RP2040 FreeRTOS Template
  * 
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *
@@ -31,6 +31,7 @@ TaskHandle_t pico_task_handle = NULL;
  * @brief Repeatedly flash the Pico's built-in LED.
  */
 void led_task_pico(void* unused_arg) {
+
     // Store the Pico LED state
     uint8_t pico_led_state = 0;
     
@@ -62,6 +63,7 @@ void led_task_pico(void* unused_arg) {
  *        based on the value passed via the inter-task queue.
  */
 void led_task_gpio(void* unused_arg) {
+
     // This variable will take a copy of the value
     // added to the FreeRTOS xQueue
     uint8_t passed_value_buffer = 0;
@@ -88,13 +90,14 @@ void led_task_gpio(void* unused_arg) {
  * @param msg: The base message to which `[DEBUG]` will be prefixed.
  */
 void log_debug(const char* msg) {
+
+#ifdef DEBUG
     uint msg_length = 9 + strlen(msg);
     char* sprintf_buffer = malloc(msg_length);
     sprintf(sprintf_buffer, "[DEBUG] %s\n", msg);
-    #ifdef DEBUG
     printf("%s", sprintf_buffer);
-    #endif
     free(sprintf_buffer);
+#endif
 }
 
 
@@ -102,6 +105,7 @@ void log_debug(const char* msg) {
  * @brief Show basic device info.
  */
 void log_device_info(void) {
+
     printf("App: %s %s\n Build: %i\n", APP_NAME, APP_VERSION, BUILD_NUM);
 }
 
@@ -110,10 +114,16 @@ void log_device_info(void) {
  * RUNTIME START
  */
 int main() {
+
     // Enable STDIO
-    #ifdef DEBUG
+#ifdef DEBUG
     stdio_usb_init();
-    #endif
+    // Pause to allow the USB path to initialize
+    sleep_ms(2000);
+
+    // Log app info
+    log_device_info();
+#endif
     
     // Set up two tasks
     // FROM 1.0.1 Store handles referencing the tasks; get return values
@@ -133,10 +143,7 @@ int main() {
     
     // Set up the event queue
     queue = xQueueCreate(4, sizeof(uint8_t));
-    
-    // Log app info
-    log_device_info();
-    
+
     // Start the FreeRTOS scheduler
     // FROM 1.0.1: Only proceed with valid tasks
     if (pico_status == pdPASS || gpio_status == pdPASS) {

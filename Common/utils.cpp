@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #2
  * General utility functions
  *
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *
@@ -25,6 +25,7 @@ namespace Utils {
  * @retval The lines as a vector.
  */
 vector<string> split_to_lines(string ml_str, string separator) {
+
     vector<string> result;
     while (ml_str.length()) {
         const int index = ml_str.find(separator);
@@ -50,6 +51,7 @@ vector<string> split_to_lines(string ml_str, string separator) {
  * @retval The requested line, otherwise an empty string.
  */
 string split_msg(string ml_str, uint32_t want_line) {
+
     const vector<string> lines = split_to_lines(ml_str);
     for (uint32_t i = 0 ; i < lines.size() ; ++i) {
         if (i == want_line) return lines[i];
@@ -66,6 +68,7 @@ string split_msg(string ml_str, uint32_t want_line) {
  * @retval A pointer to the start of the number, or `null`.
  */
 string get_sms_number(string line) {
+
     return get_field_value(line, 1);
 }
 
@@ -79,6 +82,7 @@ string get_sms_number(string line) {
  * @retval The value as a string, otherwise an empty string.
  */
 string get_field_value(string line, uint32_t field_number) {
+
     const vector<string> result = split_to_lines(line, ",");
     if (result.size() > field_number) return result[field_number];
     return "";
@@ -94,6 +98,7 @@ string get_field_value(string line, uint32_t field_number) {
  * @retval The BCD encoding of the input.
  */
 uint32_t bcd(uint32_t base) {
+
     if (base > 9999) base = 9999;
     for (uint32_t i = 0 ; i < 16 ; ++i) {
         base = base << 1;
@@ -116,6 +121,7 @@ uint32_t bcd(uint32_t base) {
  * @retval An uppercase string.
  */
 string uppercase(string base) {
+
     //string result;
     std::transform(base.begin(), base.end(), base.begin(), ::toupper);
     //printf("%s -> %s\n", base.c_str(), result.c_str());
@@ -127,6 +133,7 @@ string uppercase(string base) {
  * @brief Output basic device info.
  */
 void log_device_info(void) {
+
     printf("App: %s %s (%i)\n", APP_NAME, APP_VERSION, BUILD_NUM);
 }
 
@@ -137,6 +144,7 @@ void log_device_info(void) {
  * @param msg: The base message to which `[DEBUG]` will be prefixed.
  */
 void log_debug(const string msg) {
+
     printf("[DEBUG] %s\n", msg.c_str());
 }
 

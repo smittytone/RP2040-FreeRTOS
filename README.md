@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.4.1
+# RP2040-FreeRTOS Template 1.4.2
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -58,6 +58,26 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
         * `./deploy.sh build/App-Template/TEMPLATE.uf2`.
         * `./deploy.sh build/App-Scheduling/SCHEDULING_DEMO.uf2`.
     * To trigger a build, include the `--build` or `-b` flag: `./deploy.sh -b`.
+    
+## Debug vs Release
+
+You can switch between build types when you make the `cmake` call in step 5, above. A debug build is made by default, but you can make this explicit with
+
+```shell
+cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug
+```
+
+For a release build, which among various optimisations omits UART debugging code, call:
+
+```shell
+cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
+```
+
+Follow both of these commands with the usual
+
+```shell
+cmake --build build
+```
 
 
 ## The Apps
@@ -98,7 +118,7 @@ This work was inspired by work done on [Twilio Microvisor FreeRTOS Demo code](ht
 
 ## Copyright and Licences
 
-Application source © 2022, Tony Smith and licensed under the terms of the [MIT Licence](./LICENSE.md).
+Application source © 2023, Tony Smith and licensed under the terms of the [MIT Licence](./LICENSE.md).
 
 [FreeRTOS](https://freertos.org/) © 2021, Amazon Web Services, Inc. It is also licensed under the terms of the [MIT Licence](./LICENSE.md).
 

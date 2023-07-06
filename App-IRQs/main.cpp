@@ -1,7 +1,7 @@
 /**
  * RP2040 FreeRTOS Template - App #3
  *
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *
@@ -51,6 +51,7 @@ volatile bool do_clear = false;
  * @brief Configure the on-board LED.
  */
 void setup_led() {
+
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     led_off();
@@ -61,6 +62,7 @@ void setup_led() {
  * @brief Turn the on-board LED on.
  */
 void led_on() {
+
     led_set();
 }
 
@@ -69,6 +71,7 @@ void led_on() {
  * @brief Turn the on-board LED off.
  */
 void led_off() {
+
     led_set(false);
 }
 
@@ -77,6 +80,7 @@ void led_off() {
  * @brief Set the on-board LED's state.
  */
 void led_set(bool state) {
+
     gpio_put(PICO_DEFAULT_LED_PIN, state);
 }
 
@@ -89,6 +93,7 @@ void led_set(bool state) {
  * @brief Umbrella hardware setup routine.
  */
 void setup() {
+
     setup_i2c();
     setup_led();
     setup_gpio();
@@ -99,6 +104,7 @@ void setup() {
  * @brief Set up I2C and the devices that use it.
  */
 void setup_i2c() {
+
     // Initialise the I2C bus for the display and sensor
     I2C::setup();
 
@@ -114,6 +120,7 @@ void setup_i2c() {
 
 
 void setup_gpio() {
+
     // Configure the MCP9808 alert reader
     gpio_init(ALERT_SENSE_PIN);
     gpio_set_dir(ALERT_SENSE_PIN, GPIO_IN);
@@ -141,6 +148,7 @@ void setup_gpio() {
  * @param events: Which event(s) triggered the IRQ.
  */
 void gpio_isr(uint gpio, uint32_t events) {
+
     // See BLOG POST https://blog.smittytone.net/2022/03/20/fun-with-freertos-and-pi-pico-interrupts-semaphores-notifications/
     
     // Clear the IRQ source
@@ -181,6 +189,7 @@ void gpio_isr(uint gpio, uint32_t events) {
  * @param state: The enablement state. Default: `true`.
  */
 void enable_irq(bool state) {
+
     gpio_set_irq_enabled_with_callback(ALERT_SENSE_PIN,
                                        GPIO_IRQ_LEVEL_LOW,
                                        state,
@@ -196,6 +205,7 @@ void enable_irq(bool state) {
  * @brief Repeatedly flash the Pico's built-in LED.
  */
 void task_led_pico(void* unused_arg) {
+
     // Store the Pico LED state
     uint8_t pico_led_state = LED_OFF;
 
@@ -215,9 +225,9 @@ void task_led_pico(void* unused_arg) {
             then = now;
 
             if (state) {
-                #ifdef DEBUG
+#ifdef DEBUG
                 Utils::log_debug("PICO LED FLASH");
-                #endif
+#endif
                 
                 led_on();
                 pico_led_state = LED_OFF;
@@ -255,9 +265,9 @@ void task_led_gpio(void* unused_arg) {
         if (xQueueReceive(flip_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
-            #ifdef DEBUG
+#ifdef DEBUG
             if (passed_value_buffer == LED_ON) Utils::log_debug("GPIO LED FLASH");
-            #endif
+#endif
             
             gpio_put(RED_LED_PIN, passed_value_buffer);
         }
@@ -294,9 +304,9 @@ void task_sensor_alrt(void* unused_arg) {
         // Block until a notification arrives
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         
-        #ifdef DEBUG
+#ifdef DEBUG
         Utils::log_debug("IRQ detected");
-        #endif
+#endif
 
         // Show the IRQ was hit
         gpio_put(ALERT_LED_PIN, true);
@@ -354,9 +364,10 @@ void task_sensor_alrt(void* unused_arg) {
  * @param timer: The triggering timer.
  */
 void timer_fired_callback(TimerHandle_t timer) {
-    #ifdef DEBUG
+
+#ifdef DEBUG
     Utils::log_debug("Timer fired");
-    #endif
+#endif
     
     if (read_temp < (double)TEMP_UPPER_LIMIT_C) {
         gpio_put(ALERT_LED_PIN, false);

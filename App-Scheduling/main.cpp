@@ -1,7 +1,7 @@
 /**
  * RP2040 FreeRTOS Template - App #2
  * 
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *
@@ -41,6 +41,7 @@ volatile double read_temp = 0.0;
  * @brief Configure the on-board LED.
  */
 void setup_led() {
+
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     led_off();
@@ -51,6 +52,7 @@ void setup_led() {
  * @brief Turn the on-board LED on.
  */
 void led_on() {
+
     led_set();
 }
 
@@ -59,6 +61,7 @@ void led_on() {
  * @brief Turn the on-board LED off.
  */
 void led_off() {
+
     led_set(false);
 }
 
@@ -67,6 +70,7 @@ void led_off() {
  * @brief Set the on-board LED's state.
  */
 void led_set(bool state) {
+
     gpio_put(PICO_DEFAULT_LED_PIN, state);
 }
 
@@ -79,6 +83,7 @@ void led_set(bool state) {
  * @brief Set up I2C and the devices that use it.
  */
 void setup_i2c() {
+
     // Initialise the I2C bus for the display and sensor
     I2C::setup();
 
@@ -99,6 +104,7 @@ void setup_i2c() {
  * @brief Umbrella hardware setup routine.
  */
 void setup() {
+
     setup_i2c();
     setup_led();
 }
@@ -112,17 +118,13 @@ void setup() {
  * @brief Repeatedly flash the Pico's built-in LED.
  */
 void led_task_pico(void* unused_arg) {
+
     // Store the Pico LED state
     uint8_t pico_led_state = 0;
     
     int count = -1;
     bool state = true;
     TickType_t then = 0;
-    
-    // Log app info
-    #ifdef DEBUG
-    Utils::log_device_info();
-    #endif
     
     // Start the task loop
     while (true) {
@@ -133,7 +135,9 @@ void led_task_pico(void* unused_arg) {
             then = now;
         
             if (state) {
+#ifdef DEBUG
                 Utils::log_debug("PICO LED FLASH");
+#endif
                 led_on();
                 pico_led_state = 1;
                 xQueueSendToBack(queue, &pico_led_state, 0);
@@ -163,6 +167,7 @@ void led_task_pico(void* unused_arg) {
  *        based on the value passed via the inter-task queue
  */
 void led_task_gpio(void* unused_arg) {
+
     // This variable will take a copy of the value
     // added to the FreeRTOS xQueue
     uint8_t passed_value_buffer = 0;
@@ -176,7 +181,9 @@ void led_task_gpio(void* unused_arg) {
         if (xQueueReceive(queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
             // Received a value so flash the GPIO LED accordingly
             // (NOT the sent value)
+#ifdef DEBUG
             if (passed_value_buffer) Utils::log_debug("GPIO LED FLASH");
+#endif
             gpio_put(RED_LED_PIN, passed_value_buffer == 1 ? 0 : 1);
         }
         
@@ -188,6 +195,7 @@ void led_task_gpio(void* unused_arg) {
 
 
 void sensor_read_task(void* unused_arg) {
+
     while (true) {
         // Just read the sensor and yield
         read_temp = sensor.read_temp();
@@ -202,6 +210,7 @@ void sensor_read_task(void* unused_arg) {
  * @param number: The value to show.
  */
 void display_int(int number) {
+
     // Convert the temperature value (a float) to a string value
     // fixed to two decimal places
     if (number < 0 || number > 9999) number = 9999;
@@ -222,6 +231,7 @@ void display_int(int number) {
  * @param value: The value to show.
  */
 void display_tmp(double value) {
+
     // Convert the temperature value (a float) to a string value
     // fixed to two decimal places
     stringstream stream;
@@ -253,12 +263,16 @@ void display_tmp(double value) {
  */
 
 int main() {
+
     // DEBUG
-    #ifdef DEBUG
+#ifdef DEBUG
     stdio_init_all();
     // Pause to allow the USB path to initialize
     sleep_ms(2000);
-    #endif
+
+    // Log app info
+    Utils::log_device_info();
+#endif
     
     // Set up the hardware
     setup();

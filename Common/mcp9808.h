@@ -2,7 +2,7 @@
  * RP2040 FreeRTOS Template - App #3
  * MCP9808 I2C temperature sensor driver
  * 
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *

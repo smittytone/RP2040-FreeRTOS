@@ -1,7 +1,7 @@
 /**
  * RP2040 FreeRTOS Template - App #4
  *
- * @copyright 2022, Tony Smith (@smittytone)
+ * @copyright 2023, Tony Smith (@smittytone)
  * @version   1.4.1
  * @licence   MIT
  *
@@ -31,6 +31,7 @@ volatile TimerHandle_t led_on_timer;
  * @brief Configure the on-board LED.
  */
 void setup_led() {
+
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
     led_off();
@@ -41,6 +42,7 @@ void setup_led() {
  * @brief Turn the on-board LED on.
  */
 void led_on() {
+
     led_set();
 }
 
@@ -49,6 +51,7 @@ void led_on() {
  * @brief Turn the on-board LED off.
  */
 void led_off() {
+
     led_set(false);
 }
 
@@ -57,6 +60,7 @@ void led_off() {
  * @brief Set the on-board LED's state.
  */
 void led_set(bool state) {
+
     gpio_put(PICO_DEFAULT_LED_PIN, state);
 }
 
@@ -69,6 +73,7 @@ void led_set(bool state) {
  * @brief Repeatedly flash the Pico's built-in LED.
  */
 void task_led_pico(void* unused_arg) {
+
     // Create a repeating (parameter 3) timer
     led_on_timer = xTimerCreate("LED_ON_TIMER",
                                 pdMS_TO_TICKS(LED_FLASH_PERIOD_MS),
@@ -92,13 +97,14 @@ void task_led_pico(void* unused_arg) {
  * @param timer: The triggering timer.
  */
 void timer_fired_callback(TimerHandle_t timer) {
-    #ifdef DEBUG
+
+#ifdef DEBUG
     // Report the timer that fired
     uint32_t timer_id = (uint32_t)pvTimerGetTimerID(timer);
     stringstream log_stream;
     log_stream << "Timer fired. ID: " << timer_id << ", LED: " << (timer_id == TIMER_ID_LED_ON ? "on" : "off");
     Utils::log_debug(log_stream.str());
-    #endif
+#endif
     
     if (timer == led_on_timer) {
         // The LED ON timer fired so turn the LED on briefly
@@ -129,20 +135,16 @@ void timer_fired_callback(TimerHandle_t timer) {
  */
 
 int main() {
+
     // DEBUG
-    #ifdef DEBUG
+#ifdef DEBUG
     stdio_init_all();
     // Pause to allow the USB path to initialize
     sleep_ms(2000);
-    #endif
 
-    // Set up the hardware
-    setup_led();
-    
     // Log app info
-    #ifdef DEBUG
     Utils::log_device_info();
-    #endif
+#endif
     
     // Set up two tasks
     BaseType_t status_task_pico = xTaskCreate(task_led_pico, "PICO_LED_TASK",  128, NULL, 1, &handle_task_pico);
