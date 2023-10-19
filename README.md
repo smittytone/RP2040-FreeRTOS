@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.4.2
+# RP2040-FreeRTOS Template 1.4.3
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -48,7 +48,9 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
 
 1. Clone the repo: `git clone https://github.com/smittytone/RP2040-FreeRTOS`.
 1. Enter the repo: `cd RP2040-FreeRTOS`.
-1. Install the submodules: `git submodule update --init --recursive`.
+1. Install the primary submodules: `git submodule update --init`.
+1. Get the Pico SDK submodules: `cd pico-sdk && git submodule update --init`.
+1. `cd ..`.
 1. Optionally, edit `CMakeLists.txt` and `/<Application>/CMakeLists.txt` to rename the project.
 1. Optionally, manually configure the build process: `cmake -S . -B build/`.
 1. Optionally, manually build the app: `cmake --build build`.
@@ -78,7 +80,6 @@ Follow both of these commands with the usual
 ```shell
 cmake --build build
 ```
-
 
 ## The Apps
 
