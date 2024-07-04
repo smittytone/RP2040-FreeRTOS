@@ -2,8 +2,8 @@
  * RP2040 FreeRTOS Template - App #2
  * HT16K33-based I2C 4-digit, 7-segment LED display driver
  *
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -29,7 +29,7 @@ const uint32_t POS[4] = {0, 2, 6, 8};
  *
  * @param address: The display's I2C address. Default: 0x70.
  */
-HT16K33_Segment::HT16K33_Segment(uint32_t address) {
+HT16K33_Segment::HT16K33_Segment(uint8_t address) {
 
     if (address == 0x00 || address > 0xFF) address = HT16K33_ADDRESS;
     i2c_addr = address;
@@ -40,7 +40,7 @@ HT16K33_Segment::HT16K33_Segment(uint32_t address) {
  * @brief Convenience function to power on the display
  *        and set basic parameters.
  */
-void HT16K33_Segment::init() {
+void HT16K33_Segment::init(void) {
 
     power_on(true);
     set_brightness(2);
@@ -55,7 +55,7 @@ void HT16K33_Segment::init() {
  * @param on: `true` to turn the display on, `false` to turn it off.
               Default: `true`.
  */
-void HT16K33_Segment::power_on(bool on) {
+void HT16K33_Segment::power_on(bool on) const {
 
     I2C::write_byte(i2c_addr, on ? HT16K33_GENERIC_SYSTEM_ON : HT16K33_GENERIC_DISPLAY_OFF);
     I2C::write_byte(i2c_addr, on ? HT16K33_GENERIC_DISPLAY_ON : HT16K33_GENERIC_SYSTEM_OFF);
@@ -67,9 +67,9 @@ void HT16K33_Segment::power_on(bool on) {
  *
  * @param brightness: A value from 0 to 15. Default: 15.
  */
-void HT16K33_Segment::set_brightness(uint32_t brightness) {
+void HT16K33_Segment::set_brightness(uint8_t brightness) const {
 
-    if (brightness < 0 || brightness > 15) brightness = 15;
+    if (brightness > 15) brightness = 15;
     I2C::write_byte(i2c_addr, HT16K33_GENERIC_CMD_BRIGHTNESS | brightness);
 }
 
@@ -79,9 +79,9 @@ void HT16K33_Segment::set_brightness(uint32_t brightness) {
  *
  * @retval The instance.
  */
-HT16K33_Segment& HT16K33_Segment::clear() {
+HT16K33_Segment& HT16K33_Segment::clear(void) {
 
-    for (uint32_t i = 0 ; i < 16 ; ++i) buffer[i] = 0;
+    memset(buffer, 0x00, sizeof(buffer));
     return *this;
 }
 
@@ -109,7 +109,7 @@ HT16K33_Segment& HT16K33_Segment::set_colon(bool is_set) {
  *
  * @retval The instance.
  */
-HT16K33_Segment& HT16K33_Segment::set_glyph(uint32_t glyph, uint32_t digit, bool has_dot) {
+HT16K33_Segment& HT16K33_Segment::set_glyph(uint8_t glyph, uint8_t digit, bool has_dot) {
 
     if (digit > 4) return *this;
     if (glyph > 0xFF) return *this;
@@ -129,7 +129,7 @@ HT16K33_Segment& HT16K33_Segment::set_glyph(uint32_t glyph, uint32_t digit, bool
  *
  * @retval The instance.
  */
-HT16K33_Segment& HT16K33_Segment::set_number(uint32_t number, uint32_t digit, bool has_dot) {
+HT16K33_Segment& HT16K33_Segment::set_number(uint8_t number, uint8_t digit, bool has_dot) {
 
     if (digit > 4) return *this;
     if (number > 9) return *this;
@@ -147,7 +147,7 @@ HT16K33_Segment& HT16K33_Segment::set_number(uint32_t number, uint32_t digit, bo
  *
  * @retval The instance.
  */
-HT16K33_Segment& HT16K33_Segment::set_alpha(char chr, uint32_t digit, bool has_dot) {
+HT16K33_Segment& HT16K33_Segment::set_alpha(char chr, uint8_t digit, bool has_dot) {
 
     if (digit > 4) return *this;
 
@@ -174,18 +174,12 @@ HT16K33_Segment& HT16K33_Segment::set_alpha(char chr, uint32_t digit, bool has_d
 /**
  * @brief Write the display buffer out to I2C.
  */
-void HT16K33_Segment::draw() {
+void HT16K33_Segment::draw(void) const {
 
     // Set up the buffer holding the data to be
     // transmitted to the LED
-    uint8_t tx_buffer[17];
-    for (uint32_t i = 0 ; i < 17 ; ++i) tx_buffer[i] = 0;
-
-    // Span the 8 bytes of the graphics buffer
-    // across the 16 bytes of the LED's buffer
-    for (uint32_t i = 0 ; i < 16 ; ++i) {
-        tx_buffer[i + 1] = buffer[i];
-    }
+    uint8_t tx_buffer[17] = {0};
+    memcpy(tx_buffer + 1, buffer, 16);
 
     // Write out the transmit buffer
     I2C::write_block(i2c_addr, tx_buffer, sizeof(tx_buffer));

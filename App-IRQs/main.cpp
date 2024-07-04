@@ -1,8 +1,8 @@
 /**
  * RP2040 FreeRTOS Template - App #3
  *
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -14,24 +14,32 @@ using std::stringstream;
 
 
 /*
+ * STATIC FUNCTIONS
+ */
+[[noreturn]] static void task_led_pico(void* unused_arg);
+[[noreturn]] static void task_led_gpio(void* unused_arg);
+[[noreturn]] static void task_sensor_read(void* unused_arg);
+[[noreturn]] static void task_sensor_alrt(void* unused_arg);
+
+
+/*
  * GLOBALS
  */
-
 // Inter-task queues
-QueueHandle_t flip_queue = NULL;
-QueueHandle_t irq_queue = NULL;
+QueueHandle_t flip_queue = nullptr;
+QueueHandle_t irq_queue = nullptr;
 
 // Task handles
-TaskHandle_t handle_task_pico = NULL;
-TaskHandle_t handle_task_gpio = NULL;
-TaskHandle_t handle_task_read = NULL;
-TaskHandle_t handle_task_alrt = NULL;
+TaskHandle_t handle_task_pico = nullptr;
+TaskHandle_t handle_task_gpio = nullptr;
+TaskHandle_t handle_task_read = nullptr;
+TaskHandle_t handle_task_alrt = nullptr;
 
 // Timers
-TimerHandle_t alert_timer = NULL;
+TimerHandle_t alert_timer = nullptr;
 
 // Semaphores
-SemaphoreHandle_t semaphore_irq = NULL;
+SemaphoreHandle_t semaphore_irq = nullptr;
 
 // The 4-digit display
 HT16K33_Segment display;
@@ -50,7 +58,7 @@ volatile bool do_clear = false;
 /**
  * @brief Configure the on-board LED.
  */
-void setup_led() {
+void setup_led(void) {
 
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
@@ -61,7 +69,7 @@ void setup_led() {
 /**
  * @brief Turn the on-board LED on.
  */
-void led_on() {
+void led_on(void) {
 
     led_set();
 }
@@ -70,7 +78,7 @@ void led_on() {
 /**
  * @brief Turn the on-board LED off.
  */
-void led_off() {
+void led_off(void) {
 
     led_set(false);
 }
@@ -92,7 +100,7 @@ void led_set(bool state) {
 /**
  * @brief Umbrella hardware setup routine.
  */
-void setup() {
+void setup(void) {
 
     setup_i2c();
     setup_led();
@@ -103,7 +111,7 @@ void setup() {
 /**
  * @brief Set up I2C and the devices that use it.
  */
-void setup_i2c() {
+void setup_i2c(void) {
 
     // Initialise the I2C bus for the display and sensor
     I2C::setup();
@@ -119,7 +127,7 @@ void setup_i2c() {
 }
 
 
-void setup_gpio() {
+void setup_gpio(void) {
 
     // Configure the MCP9808 alert reader
     gpio_init(ALERT_SENSE_PIN);
@@ -150,30 +158,30 @@ void setup_gpio() {
 void gpio_isr(uint gpio, uint32_t events) {
 
     // See BLOG POST https://blog.smittytone.net/2022/03/20/fun-with-freertos-and-pi-pico-interrupts-semaphores-notifications/
-    
+
     // Clear the IRQ source
     enable_irq(false);
-    
+
     /* ISR FUNCTION BODY USING DIRECT TASK NOTIFICATIONS */
     // Signal the alert clearance task
-    static BaseType_t higher_priority_task_woken = pdFALSE;
+    static auto higher_priority_task_woken = pdFALSE;
     vTaskNotifyGiveFromISR(handle_task_alrt, &higher_priority_task_woken);
-    
+
     // Exit to context switch if necessary
     portYIELD_FROM_ISR(higher_priority_task_woken);
-    
-    
+
+
     /* ISR FUNCTION BODY USING A SEMAPHORE */
     /*
     // Signal the alert clearance task
     static BaseType_t higher_priority_task_woken = pdFALSE;
     xSemaphoreGiveFromISR(semaphore_irq, &higher_priority_task_woken);
-    
+
     // Exit to context switch if necessary
     portYIELD_FROM_ISR(higher_priority_task_woken);
      */
-    
-    
+
+
     /*  ISR FUNCTION BODY USING A QUEUE */
     /*
     // Signal the alert clearance task
@@ -204,7 +212,7 @@ void enable_irq(bool state) {
 /**
  * @brief Repeatedly flash the Pico's built-in LED.
  */
-void task_led_pico(void* unused_arg) {
+[[noreturn]] static void task_led_pico(void* unused_arg) {
 
     // Store the Pico LED state
     uint8_t pico_led_state = LED_OFF;
@@ -212,7 +220,7 @@ void task_led_pico(void* unused_arg) {
     int count = -1;
     bool state = true;
     TickType_t then = 0;
-    
+
     // Enable IRQ on the sensor pin
     if (sensor_good) enable_irq(true);
 
@@ -228,18 +236,19 @@ void task_led_pico(void* unused_arg) {
 #ifdef DEBUG
                 Utils::log_debug("PICO LED FLASH");
 #endif
-                
+
                 led_on();
                 pico_led_state = LED_OFF;
                 xQueueSendToBack(flip_queue, &pico_led_state, 0);
-                display_int(++count);
+                count++;
+                display_int(count);
             } else {
                 led_off();
                 pico_led_state = LED_ON;
                 xQueueSendToBack(flip_queue, &pico_led_state, 0);
                 display_tmp(read_temp);
             }
-            
+
             state = !state;
             if (count > 9998) count = 0;
         }
@@ -255,7 +264,7 @@ void task_led_pico(void* unused_arg) {
  * @brief Repeatedly flash an LED connected to GPIO pin 20
  *        based on the value passed via the inter-task queue
  */
-void task_led_gpio(void* unused_arg) {
+[[noreturn]] static void task_led_gpio(void* unused_arg) {
     // This variable will take a copy of the value
     // added to the FreeRTOS xQueue
     uint8_t passed_value_buffer = LED_OFF;
@@ -268,10 +277,10 @@ void task_led_gpio(void* unused_arg) {
 #ifdef DEBUG
             if (passed_value_buffer == LED_ON) Utils::log_debug("GPIO LED FLASH");
 #endif
-            
+
             gpio_put(RED_LED_PIN, passed_value_buffer);
         }
-        
+
         // Yield -- uncomment the next line to enable,
         // See BLOG POST https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/
         //vTaskDelay(0);
@@ -283,7 +292,7 @@ void task_led_gpio(void* unused_arg) {
  * @brief Repeatedly read the sensor and store the current
  *        temperature.
  */
-void task_sensor_read(void* unused_arg) {
+[[noreturn]] static void task_sensor_read(void* unused_arg) {
     while (true) {
         // Just read the sensor and yield
         read_temp = sensor.read_temp();
@@ -296,14 +305,14 @@ void task_sensor_read(void* unused_arg) {
  * @brief Repeatedly check for an ISR-issued notification that
  *        the sensor alert was triggered.
  */
-void task_sensor_alrt(void* unused_arg) {
+[[noreturn]] static void task_sensor_alrt(void* unused_arg) {
     // See BLOG POST https://blog.smittytone.net/2022/03/20/fun-with-freertos-and-pi-pico-interrupts-semaphores-notifications/
-    
+
     /*  ALERT HANDLER TASK FUNCTION BODY USING DIRECT TASK NOTIFICATIONS */
     while (true) {
         // Block until a notification arrives
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        
+
 #ifdef DEBUG
         Utils::log_debug("IRQ detected");
 #endif
@@ -314,7 +323,7 @@ void task_sensor_alrt(void* unused_arg) {
         // Set and start a timer to clear the alert
         set_alert_timer();
     }
-    
+
     /*  ALERT HANDLER TASK FUNCTION BODY USING A SEMAPHORE */
     /*
     while (true) {
@@ -332,12 +341,12 @@ void task_sensor_alrt(void* unused_arg) {
          }
      }
      */
-    
-    
+
+
     /*  ALERT HANDLER TASK FUNCTION BODY USING A QUEUE */
     /*
     uint8_t passed_value_buffer = 0;
-   
+
     while (true) {
         // Wait for event: is a message pending in the IRQ queue?
         if (xQueueReceive(irq_queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
@@ -345,10 +354,10 @@ void task_sensor_alrt(void* unused_arg) {
                 #ifdef DEBUG
                 Utils::log_debug("IRQ detected");
                 #endif
-                
+
                 // Show the IRQ was hit
                 gpio_put(ALERT_LED_PIN, true);
-                
+
                 // Set and start a timer to clear the alert
                 set_alert_timer();
             }
@@ -368,14 +377,14 @@ void timer_fired_callback(TimerHandle_t timer) {
 #ifdef DEBUG
     Utils::log_debug("Timer fired");
 #endif
-    
+
     if (read_temp < (double)TEMP_UPPER_LIMIT_C) {
         gpio_put(ALERT_LED_PIN, false);
-        alert_timer = NULL;
-        
+        alert_timer = nullptr;
+
         // Reset the sensor alert
         sensor.clear_alert(true);
-        
+
         // IRQ disabled at this point, so reenable it
         // NOTE This has to come after the previous line, or it
         //      will trip immediately!
@@ -390,13 +399,13 @@ void timer_fired_callback(TimerHandle_t timer) {
 /**
  * @brief Set and start a timer to clear the alert.
  */
-void set_alert_timer() {
+void set_alert_timer(void) {
     alert_timer = xTimerCreate("ALERT_TIMER",
                                pdMS_TO_TICKS(ALERT_DISPLAY_PERIOD_MS),
                                pdFALSE,
-                               (void*)0,
+                               nullptr,
                                timer_fired_callback);
-    if (alert_timer != NULL) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
+    if (alert_timer != nullptr) xTimerStart(alert_timer, SENSOR_TASK_DELAY_TICKS);
 }
 
 
@@ -433,7 +442,7 @@ void display_tmp(double value) {
     const string temp = stream.str();
 
     // Display the temperature on the LED
-    uint32_t digit = 0;
+    uint8_t digit = 0;
     char previous_char = 0;
     char current_char = 0;
     for (uint32_t i = 0 ; (i < temp.length() || digit == 3) ; ++i) {
@@ -467,28 +476,28 @@ int main() {
     // Set up the hardware
     setup();
     display.set_brightness(1);
-    
+
     // Log app info
     #ifdef DEBUG
     Utils::log_device_info();
     #endif
-    
+
     // Set up four tasks
-    BaseType_t status_task_pico = xTaskCreate(task_led_pico, "PICO_LED_TASK",  128, NULL, 1, &handle_task_pico);
-    BaseType_t status_task_gpio = xTaskCreate(task_led_gpio, "GPIO_LED_TASK",  128, NULL, 1, &handle_task_gpio);
-    BaseType_t status_task_read = xTaskCreate(task_sensor_read, "SENSOR_TASK", 128, NULL, 1, &handle_task_read);
-    BaseType_t status_task_alrt = xTaskCreate(task_sensor_alrt, "ALERT_TASK",  128, NULL, 1, &handle_task_alrt);
-    
+    BaseType_t status_task_pico = xTaskCreate(task_led_pico, "PICO_LED_TASK",  128, nullptr, 1, &handle_task_pico);
+    BaseType_t status_task_gpio = xTaskCreate(task_led_gpio, "GPIO_LED_TASK",  128, nullptr, 1, &handle_task_gpio);
+    BaseType_t status_task_read = xTaskCreate(task_sensor_read, "SENSOR_TASK", 128, nullptr, 1, &handle_task_read);
+    BaseType_t status_task_alrt = xTaskCreate(task_sensor_alrt, "ALERT_TASK",  128, nullptr, 1, &handle_task_alrt);
+
     // Start the FreeRTOS scheduler if any of the tasks are good
     if (status_task_pico == pdPASS || status_task_gpio == pdPASS || (status_task_read == pdPASS && status_task_alrt == pdPASS)) {
         // Set up the event queues: one for flips, one for IRQs
         flip_queue = xQueueCreate(4, sizeof(uint8_t));
         irq_queue = xQueueCreate(1, sizeof(uint8_t));
-        
+
         // Create a binary semaphore to signal IRQs
         semaphore_irq = xSemaphoreCreateBinary();
-        assert(semaphore_irq != NULL);
-        
+        assert(semaphore_irq != nullptr);
+
         // Start the scheduler
         vTaskStartScheduler();
     } else {
@@ -506,5 +515,5 @@ int main() {
     // We should never get here, but just in case...
     while(true) {
         // NOP
-    };
+    }
 }

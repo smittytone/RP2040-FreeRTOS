@@ -1,8 +1,8 @@
 /**
  * RP2040 FreeRTOS Template - App #2
  *
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -43,26 +43,26 @@ extern "C" {
 /**
  * CONSTANTS
  */
-#define         RED_LED_PIN           20
+constexpr uint8_t   RED_LED_PIN = 20;
 
 
 /**
  * PROTOTYPES
  */
-void setup();
-void setup_led();
-void setup_i2c();
+void                setup(void);
+void                setup_led(void);
+void                setup_i2c(void);
 
-void led_on();
-void led_off();
-void led_set(bool state = true);
+void                led_on(void);
+void                led_off(void);
+void                led_set(bool state = true);
 
-void led_task_pico(void* unused_arg);
-void led_task_gpio(void* unused_arg);
-void sensor_read_task(void* unused_arg);
+[[noreturn]] void   led_task_pico(void* unused_arg);
+[[noreturn]] void   led_task_gpio(void* unused_arg);
+[[noreturn]] void   sensor_read_task(void* unused_arg);
 
-void display_int(int number);
-void display_tmp(double value);
+void                display_int(int number);
+void                display_tmp(double value);
 
 
 #ifdef __cplusplus

@@ -2,8 +2,8 @@
  * RP2040 FreeRTOS Template - App #3
  * MCP9808 I2C temperature sensor driver
  *
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -17,11 +17,11 @@ using std::string;
  *
  * @param address: The I2C address of the device to write to.
  */
-MCP9808::MCP9808(uint32_t address) {
+MCP9808::MCP9808(uint8_t address) {
 
     if (address == 0x00 || address > 0xFF) address = MCP9808_I2CADDR_DEFAULT;
     i2c_addr = address;
-    
+
     // Set defaults
     limit_lower = DEFAULT_TEMP_LOWER_LIMIT_C;
     limit_upper = DEFAULT_TEMP_UPPER_LIMIT_C;
@@ -34,7 +34,7 @@ MCP9808::MCP9808(uint32_t address) {
  *
  * @retval `true` if we can read values and they are right, otherwise `false`.
  */
-bool MCP9808::begin() {
+bool MCP9808::begin(void) {
 
     // Set up alerts threshold temperatures
     // NOTE You MUST set all three thresholds
@@ -42,7 +42,7 @@ bool MCP9808::begin() {
     set_lower_limit(limit_lower);
     set_upper_limit(limit_upper);
     set_critical_limit(limit_critical);
-    
+
     // Clear and enable the alert pin
     clear_alert(true);
 
@@ -59,8 +59,8 @@ bool MCP9808::begin() {
     I2C::read_block(i2c_addr, did_data, 2);
 
     // Bytes to integers
-    const uint16_t mid_value = (mid_data[0] << 8) | mid_data[1];
-    const uint16_t did_value = (did_data[0] << 8) | did_data[1];
+    const auto mid_value = (uint16_t)((mid_data[0] << 8) | mid_data[1]);
+    const auto did_value = (uint16_t)((did_data[0] << 8) | did_data[1]);
 
     // Returns True if the device is initialised, False otherwise.
     return (mid_value == 0x0054 && did_value == 0x0400);
@@ -72,7 +72,7 @@ bool MCP9808::begin() {
  *
  * @retval The temperature in Celsius.
  */
-double MCP9808::read_temp() {
+double MCP9808::read_temp(void) const {
 
     // Read sensor and return its value in degrees celsius.
     uint8_t temp_data[2] = {0};
@@ -90,7 +90,7 @@ double MCP9808::read_temp() {
  *
  * @param do_enable: Set to `true` to enable the alert.
  */
-void MCP9808::clear_alert(bool do_enable) {
+void MCP9808::clear_alert(bool do_enable) const {
 
     // Read the current reg value
     uint8_t config_data[3] = {0};
@@ -166,15 +166,15 @@ void MCP9808::set_lower_limit(uint16_t lower_temp) {
  *                       MCP9808_REG_CRIT_TEMP.
  * @param temp:          The temperature (as an integer)
  */
-void MCP9808::set_temp_limit(uint8_t temp_register, uint16_t temp) {
+void MCP9808::set_temp_limit(uint8_t temp_register, uint16_t temp) const {
 
     temp &= 127;
-    temp = (temp << 4);
+    temp = (uint8_t)(temp << 4);
     uint8_t data[3] = {temp_register};
     data[1] = (temp & 0xFF00) >> 8;
     data[2] = temp & 0xFF;
     I2C::write_block(i2c_addr, data, 3);
-    
+
     // Read and check upper temp
 #ifdef DEBUG
     string reg_name = "Lower Limit";
@@ -197,7 +197,7 @@ void MCP9808::set_temp_limit(uint8_t temp_register, uint16_t temp) {
  *
  * @retval The temperature in Celsius.
  */
-double MCP9808::get_temp(uint8_t* data) {
+double MCP9808::get_temp(const uint8_t* data) const {
 
     const uint32_t temp_raw = (data[0] << 8) | data[1];
     double temp_cel = (temp_raw & 0x0FFF) / 16.0;

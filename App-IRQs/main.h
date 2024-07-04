@@ -1,8 +1,8 @@
 /**
  * RP2040 FreeRTOS Template - App #3
  *
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -45,47 +45,42 @@ extern "C" {
 /**
  * CONSTANTS
  */
-#define         RED_LED_PIN                 20
-#define         ALERT_LED_PIN               26
-#define         ALERT_SENSE_PIN             16
+constexpr uint8_t   RED_LED_PIN                 = 20;
+constexpr uint8_t   ALERT_LED_PIN               = 26;
+constexpr uint8_t   ALERT_SENSE_PIN             = 16;
 
-#define         SENSOR_TASK_DELAY_TICKS     20
-#define         ALERT_DISPLAY_PERIOD_MS     10000
+constexpr uint8_t   SENSOR_TASK_DELAY_TICKS     = 20;
+constexpr uint16_t  ALERT_DISPLAY_PERIOD_MS     = 10000;
 
-#define         LED_ON                      1
-#define         LED_OFF                     0
-#define         LED_ERROR_FLASHES           5
+constexpr uint8_t   LED_ON                      = 1;
+constexpr uint8_t   LED_OFF                     = 0;
+constexpr uint8_t   LED_ERROR_FLASHES           = 5;
 
-#define         TEMP_LOWER_LIMIT_C          10
-#define         TEMP_UPPER_LIMIT_C          25
-#define         TEMP_CRIT_LIMIT_C           50
+constexpr uint8_t   TEMP_LOWER_LIMIT_C          = 10;
+constexpr uint8_t   TEMP_UPPER_LIMIT_C          = 25;
+constexpr uint8_t   TEMP_CRIT_LIMIT_C           = 50;
 
 
 /**
  * PROTOTYPES
  */
-void setup();
-void setup_led();
-void setup_i2c();
-void setup_gpio();
+void                setup(void);
+void                setup_led(void);
+void                setup_i2c(void);
+void                setup_gpio(void);
 
-void enable_irq(bool state = true);
-void gpio_isr(uint gpio, uint32_t events);
+void                enable_irq(bool state = true);
+void                gpio_isr(uint gpio, uint32_t events);
 
-void led_on();
-void led_off();
-void led_set(bool state = true);
+void                led_on(void);
+void                led_off(void);
+void                led_set(bool state = true);
 
-void task_led_pico(void* unused_arg);
-void task_led_gpio(void* unused_arg);
-void task_sensor_read(void* unused_arg);
-void task_sensor_alrt(void* unused_arg);
+void                display_int(int number);
+void                display_tmp(double value);
 
-void display_int(int number);
-void display_tmp(double value);
-
-void timer_fired_callback(TimerHandle_t timer);
-void set_alert_timer();
+void                timer_fired_callback(TimerHandle_t timer);
+void                set_alert_timer(void);
 
 
 #ifdef __cplusplus

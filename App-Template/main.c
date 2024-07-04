@@ -1,8 +1,8 @@
 /**
  * RP2040 FreeRTOS Template
- * 
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ *
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -34,11 +34,11 @@ void led_task_pico(void* unused_arg) {
 
     // Store the Pico LED state
     uint8_t pico_led_state = 0;
-    
+
     // Configure the Pico's on-board LED
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
-    
+
     while (true) {
         // Turn Pico LED on an add the LED state
         // to the FreeRTOS xQUEUE
@@ -47,7 +47,7 @@ void led_task_pico(void* unused_arg) {
         gpio_put(PICO_DEFAULT_LED_PIN, pico_led_state);
         xQueueSendToBack(queue, &pico_led_state, 0);
         vTaskDelay(ms_delay);
-        
+
         // Turn Pico LED off an add the LED state
         // to the FreeRTOS xQUEUE
         pico_led_state = 0;
@@ -67,11 +67,11 @@ void led_task_gpio(void* unused_arg) {
     // This variable will take a copy of the value
     // added to the FreeRTOS xQueue
     uint8_t passed_value_buffer = 0;
-    
+
     // Configure the GPIO LED
     gpio_init(RED_LED_PIN);
     gpio_set_dir(RED_LED_PIN, GPIO_OUT);
-    
+
     while (true) {
         // Check for an item in the FreeRTOS xQueue
         if (xQueueReceive(queue, &passed_value_buffer, portMAX_DELAY) == pdPASS) {
@@ -124,23 +124,23 @@ int main() {
     // Log app info
     log_device_info();
 #endif
-    
+
     // Set up two tasks
     // FROM 1.0.1 Store handles referencing the tasks; get return values
     // NOTE Arg 3 is the stack depth -- in words, not bytes
-    BaseType_t pico_status = xTaskCreate(led_task_pico, 
-                                         "PICO_LED_TASK", 
-                                         128, 
-                                         NULL, 
-                                         1, 
+    BaseType_t pico_status = xTaskCreate(led_task_pico,
+                                         "PICO_LED_TASK",
+                                         128,
+                                         NULL,
+                                         1,
                                          &pico_task_handle);
-    BaseType_t gpio_status = xTaskCreate(led_task_gpio, 
-                                         "GPIO_LED_TASK", 
-                                         128, 
-                                         NULL, 
-                                         1, 
+    BaseType_t gpio_status = xTaskCreate(led_task_gpio,
+                                         "GPIO_LED_TASK",
+                                         128,
+                                         NULL,
+                                         1,
                                          &gpio_task_handle);
-    
+
     // Set up the event queue
     queue = xQueueCreate(4, sizeof(uint8_t));
 
@@ -149,9 +149,9 @@ int main() {
     if (pico_status == pdPASS || gpio_status == pdPASS) {
         vTaskStartScheduler();
     }
-    
+
     // We should never get here, but just in case...
     while(true) {
         // NOP
-    };
+    }
 }

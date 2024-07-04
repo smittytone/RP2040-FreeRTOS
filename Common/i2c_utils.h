@@ -1,9 +1,9 @@
 /**
  * RP2040 FreeRTOS Template - App #2
  * Generic I2C functions
- * 
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ *
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -31,21 +31,21 @@
 /*
  * CONSTANTS
  */
-#define I2C_PORT                i2c1
-#define I2C_FREQUENCY           400000
-#define SDA_GPIO                2
-#define SCL_GPIO                3
+constexpr i2c_inst_t* I2C_PORT      = i2c1;
+constexpr uint32_t    I2C_FREQUENCY = 400000;
+constexpr uint8_t     SDA_GPIO      = 2;
+constexpr uint8_t     SCL_GPIO      = 3;
 
 
 /*
  * PROTOTYPES
  */
 namespace I2C {
-    void        setup();
+    void        setup(void);
     void        write_byte(uint8_t address, uint8_t byte);
-    void        write_block(uint8_t address, uint8_t *data, uint8_t count);
-    void        read_block(uint8_t address, uint8_t *data, uint8_t count);
-    int         read_noblock(uint8_t address, uint8_t *data, uint8_t count);
+    void        write_block(uint8_t address, const uint8_t* data, uint8_t count);
+    void        read_block(uint8_t address, uint8_t* data, uint8_t count);
+    int         read_noblock(uint8_t address, uint8_t* data, uint8_t count);
 }
 
 

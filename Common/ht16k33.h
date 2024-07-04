@@ -1,9 +1,9 @@
 /**
  * RP2040 FreeRTOS Template - App #2
  * HT16K33-based I2C 4-digit, 7-segment LED display driver
- * 
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ *
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -32,19 +32,19 @@
 /*
  * CONSTANTS
  */
-#define HT16K33_GENERIC_DISPLAY_ON          0x81
-#define HT16K33_GENERIC_DISPLAY_OFF         0x80
-#define HT16K33_GENERIC_SYSTEM_ON           0x21
-#define HT16K33_GENERIC_SYSTEM_OFF          0x20
-#define HT16K33_GENERIC_DISPLAY_ADDRESS     0x00
-#define HT16K33_GENERIC_CMD_BRIGHTNESS      0xE0
-#define HT16K33_GENERIC_CMD_BLINK           0x81
-#define HT16K33_ADDRESS                     0x70
+constexpr uint8_t HT16K33_GENERIC_DISPLAY_ON        = 0x81;
+constexpr uint8_t HT16K33_GENERIC_DISPLAY_OFF       = 0x80;
+constexpr uint8_t HT16K33_GENERIC_SYSTEM_ON         = 0x21;
+constexpr uint8_t HT16K33_GENERIC_SYSTEM_OFF        = 0x20;
+constexpr uint8_t HT16K33_GENERIC_DISPLAY_ADDRESS   = 0x00;
+constexpr uint8_t HT16K33_GENERIC_CMD_BRIGHTNESS    = 0xE0;
+constexpr uint8_t HT16K33_GENERIC_CMD_BLINK         = 0x81;
+constexpr uint8_t HT16K33_ADDRESS                   = 0x70;
 
-#define HT16K33_SEGMENT_COLON_ROW           0x04
-#define HT16K33_SEGMENT_MINUS_CHAR          0x10
-#define HT16K33_SEGMENT_DEGREE_CHAR         0x11
-#define HT16K33_SEGMENT_SPACE_CHAR          0x00
+constexpr uint8_t HT16K33_SEGMENT_COLON_ROW         = 0x04;
+constexpr uint8_t HT16K33_SEGMENT_MINUS_CHAR        = 0x10;
+constexpr uint8_t HT16K33_SEGMENT_DEGREE_CHAR       = 0x11;
+constexpr uint8_t HT16K33_SEGMENT_SPACE_CHAR        = 0x00;
 
 
 /**
@@ -53,25 +53,23 @@
 class HT16K33_Segment {
 
     public:
-        HT16K33_Segment(uint32_t address = HT16K33_ADDRESS);
+        explicit HT16K33_Segment(uint8_t address = HT16K33_ADDRESS);
 
-        void                init();
-        void                power_on(bool turn_on = true);
+        void                init(void);
+        void                power_on(bool turn_on = true) const;
 
-        void                set_brightness(uint32_t brightness = 15);
+        void                set_brightness(uint8_t brightness = 15) const;
         HT16K33_Segment&    set_colon(bool is_set = false);
-        HT16K33_Segment&    set_glyph(uint32_t glyph, uint32_t digit, bool has_dot = false);
-        HT16K33_Segment&    set_number(uint32_t number, uint32_t digit, bool has_dot = false);
-        HT16K33_Segment&    set_alpha(char chr, uint32_t digit, bool has_dot = false);
+        HT16K33_Segment&    set_glyph(uint8_t glyph, uint8_t digit, bool has_dot = false);
+        HT16K33_Segment&    set_number(uint8_t number, uint8_t digit, bool has_dot = false);
+        HT16K33_Segment&    set_alpha(char chr, uint8_t digit, bool has_dot = false);
 
-        HT16K33_Segment&    clear();
-        void                draw();
-
+        HT16K33_Segment&    clear(void);
+        void                draw(void) const;
 
     private:
         uint8_t             buffer[16];
-        uint32_t            pos[4];
-        uint32_t            i2c_addr;
+        uint8_t             i2c_addr;
 };
 
 

@@ -2,8 +2,8 @@
  * RP2040 FreeRTOS Template - App #2
  * General utility functions
  *
- * @copyright 2023, Tony Smith (@smittytone)
- * @version   1.4.2
+ * @copyright 2024, Tony Smith (@smittytone)
+ * @version   1.5.0
  * @licence   MIT
  *
  */
@@ -24,7 +24,7 @@ namespace Utils {
  *
  * @retval The lines as a vector.
  */
-vector<string> split_to_lines(string ml_str, string separator) {
+vector<string> split_to_lines(string ml_str, const string& separator) {
 
     vector<string> result;
     while (ml_str.length()) {
@@ -67,7 +67,7 @@ string split_msg(string ml_str, uint32_t want_line) {
  *
  * @retval A pointer to the start of the number, or `null`.
  */
-string get_sms_number(string line) {
+string get_sms_number(const string& line) {
 
     return get_field_value(line, 1);
 }
@@ -81,7 +81,7 @@ string get_sms_number(string line) {
  *
  * @retval The value as a string, otherwise an empty string.
  */
-string get_field_value(string line, uint32_t field_number) {
+string get_field_value(const string& line, uint32_t field_number) {
 
     const vector<string> result = split_to_lines(line, ",");
     if (result.size() > field_number) return result[field_number];
@@ -141,7 +141,7 @@ void log_device_info(void) {
  *
  * @param msg: The base message to which `[DEBUG]` will be prefixed.
  */
-void log_debug(const string msg) {
+void log_debug(const string& msg) {
 
     printf("[DEBUG] %s\n", msg.c_str());
 }

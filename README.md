@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.4.3
+# RP2040-FreeRTOS Template 1.5.0
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -114,11 +114,11 @@ Workspace files are included for the Visual Studio Code and Xcode IDEs.
 
 ## Credits
 
-This work was inspired by work done on [Twilio Microvisor FreeRTOS Demo code](https://github.com/twilio/twilio-microvisor-freertos), but the version of the `FreeRTOSConfig.h` file included here was derived from [work by @yunka2](https://github.com/yunkya2/pico-freertos-sample).
+This work was inspired by work done on [KORE Wireless Microvisor FreeRTOS Demo code](https://github.com/korewireless/Microvisor-Demo-CMSIS-Freertos), but the version of the `FreeRTOSConfig.h` file included here was derived from [work by @yunka2](https://github.com/yunkya2/pico-freertos-sample).
 
 ## Copyright and Licences
 
-Application source © 2023, Tony Smith and licensed under the terms of the [MIT Licence](./LICENSE.md).
+Application source © 2024, Tony Smith and licensed under the terms of the [MIT Licence](./LICENSE.md).
 
 [FreeRTOS](https://freertos.org/) © 2021, Amazon Web Services, Inc. It is also licensed under the terms of the [MIT Licence](./LICENSE.md).
 
