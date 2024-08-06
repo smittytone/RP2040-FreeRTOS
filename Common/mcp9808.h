@@ -50,7 +50,7 @@ constexpr uint8_t MCP9808_CONFIG_ALRT_POL     = 0x02;
 constexpr uint8_t MCP9808_CONFIG_ALRT_MODE    = 0x01;
 
 constexpr uint8_t DEFAULT_TEMP_LOWER_LIMIT_C  = 10;
-constexpr uint8_t DEFAULT_TEMP_UPPER_LIMIT_C  = 25;
+constexpr uint8_t DEFAULT_TEMP_UPPER_LIMIT_C  = 30;
 constexpr uint8_t DEFAULT_TEMP_CRIT_LIMIT_C   = 50;
 
 /**

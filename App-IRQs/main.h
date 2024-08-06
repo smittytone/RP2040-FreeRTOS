@@ -57,7 +57,7 @@ constexpr uint8_t   LED_OFF                     = 0;
 constexpr uint8_t   LED_ERROR_FLASHES           = 5;
 
 constexpr uint8_t   TEMP_LOWER_LIMIT_C          = 10;
-constexpr uint8_t   TEMP_UPPER_LIMIT_C          = 25;
+constexpr uint8_t   TEMP_UPPER_LIMIT_C          = 30;
 constexpr uint8_t   TEMP_CRIT_LIMIT_C           = 50;
 
 
