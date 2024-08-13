@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.5.0
+# RP2040-FreeRTOS Template 1.5.1
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -80,6 +80,20 @@ Follow both of these commands with the usual
 cmake --build build
 ```
 
+## Pico SDK
+
+The repo has been updated for the Pico SDK 2.0. The new SDK assumes you’re using an RP2350-based Pico 2 board, so please set the following environment variable before building these examples:
+
+```shell
+export PICO_BOARD={YOUR_BOARD_TYPE}
+```
+
+For the original Pico, for example:
+
+```shell
+export PICO_BOARD=pico
+```
+
 ## The Apps
 
 This repo includes a number of deployable apps. The project builds them all, sequentially. Exclude apps from the build process by commenting out their `add_subdirectory()` lines in the top-level `CMakeLists.txt`.
@@ -122,4 +136,4 @@ Application source © 2024, Tony Smith and licensed under the terms of the [MIT 
 
 [FreeRTOS](https://freertos.org/) © 2021, Amazon Web Services, Inc. It is also licensed under the terms of the [MIT Licence](./LICENSE.md).
 
-The [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk) is © 2020, Raspberry Pi (Trading) Ltd. It is licensed under the terms of the [BSD 3-Clause "New" or "Revised" Licence](https://github.com/raspberrypi/pico-sdk/blob/master/LICENSE.TXT).
+The [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk) is © 2024, Raspberry Pi (Trading) Ltd. It is licensed under the terms of the [BSD 3-Clause "New" or "Revised" Licence](https://github.com/raspberrypi/pico-sdk/blob/master/LICENSE.TXT).

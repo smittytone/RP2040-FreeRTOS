@@ -3,7 +3,7 @@
  * MCP9808 I2C temperature sensor driver
  *
  * @copyright 2024, Tony Smith (@smittytone)
- * @version   1.5.0
+ * @version   1.5.1
  * @licence   MIT
  *
  */
