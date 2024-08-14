@@ -94,11 +94,13 @@ void MCP9808::clear_alert(bool do_enable) const {
 
     // Read the current reg value
     uint8_t config_data[3] = {0};
-    I2C::write_byte(i2c_addr, MCP9808_REG_CONFIG);
+    config_data[0] = MCP9808_REG_CONFIG;
+    I2C::write_byte(i2c_addr, config_data[0]);
     I2C::read_block(i2c_addr, &config_data[1], 2);
 
-    // Set LSB bit 5 to clear the interrupt, and write it back
-    config_data[0] = MCP9808_REG_CONFIG;
+    // Set LSB bit 5 to clear the interrupt, bit 0 to select interrupt mode.
+    // Clear LSB bit 1 to select active-low IRQs (IRQ example includes pull-up)
+    // and write it back
     config_data[2] = 0x21;
 
     if (do_enable) {
@@ -113,7 +115,7 @@ void MCP9808::clear_alert(bool do_enable) const {
 
     // Read it back to apply?
     uint8_t check_data[2] = {0};
-    I2C::write_byte(i2c_addr, MCP9808_REG_CONFIG);
+    I2C::write_byte(i2c_addr, config_data[0]);
     I2C::read_block(i2c_addr, check_data, 2);
 #ifdef DEBUG
     printf("[DEBUG] MCP9809 alert config read:  -- %02x %02x\n",  check_data[0],  check_data[1]);
