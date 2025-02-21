@@ -1,4 +1,4 @@
 *.xcworkspace/xcuserdata/*.xcuserdatad
 build
-#.vscode/*
+.vscode
 .cache
