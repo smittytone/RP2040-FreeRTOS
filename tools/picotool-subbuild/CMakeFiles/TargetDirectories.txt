@@ -1,3 +1,0 @@
-/Users/smitty/GitHub/RP2040-FreeRTOS/tools/picotool-subbuild/CMakeFiles/picotool-populate.dir
-/Users/smitty/GitHub/RP2040-FreeRTOS/tools/picotool-subbuild/CMakeFiles/edit_cache.dir
-/Users/smitty/GitHub/RP2040-FreeRTOS/tools/picotool-subbuild/CMakeFiles/rebuild_cache.dir
