@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.5.1
+# RP2040-FreeRTOS Template 1.6.0
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
@@ -55,7 +55,7 @@ To use the code in this repo, your system must be set up for RP2040 C/C++ develo
 1. Optionally, manually build the app: `cmake --build build`.
 1. Connect your device so it’s ready for file transfer.
 1. Install the app: `./deploy.sh`.
-    * Pass the app you wish to deplopy:
+    * Pass the app you wish to deploy:
         * `./deploy.sh build/App-Template/TEMPLATE.uf2`.
         * `./deploy.sh build/App-Scheduling/SCHEDULING_DEMO.uf2`.
     * To trigger a build, include the `--build` or `-b` flag: `./deploy.sh -b`.
@@ -68,7 +68,7 @@ You can switch between build types when you make the `cmake` call in step 5, abo
 cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug
 ```
 
-For a release build, which among various optimisations omits UART debugging code, call:
+For a release build, which among various optimizations omits UART debugging code, call:
 
 ```shell
 cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
@@ -82,7 +82,7 @@ cmake --build build
 
 ## Pico SDK
 
-The repo has been updated for the Pico SDK 2.0. The new SDK assumes you’re using an RP2350-based Pico 2 board, so please set the following environment variable before building these examples:
+The repo has been updated for the Pico SDK 2.2.0. The SDK assumes you’re using an RP2350-based Pico 2 board, so please set the following environment variable before building these examples:
 
 ```shell
 export PICO_BOARD={YOUR_BOARD_TYPE}
@@ -93,6 +93,14 @@ For the original Pico, for example:
 ```shell
 export PICO_BOARD=pico
 ```
+
+Additionally, issue these commands:
+
+```shell
+export PICOTOOL_FETCH_FROM_GIT_PATH=/path/to/RP2040-FreeRTOS/tools
+mdkir /path/to/RP2040-FreeRTOS/tools
+```
+**Note** If you have updated from a previous version of the this repo, I recommend deleting your build folder and re-running `cmake -S . -B build`.
 
 ## The Apps
 
@@ -126,14 +134,18 @@ This C++ app provides an introduction to FreeRTOS’ software timers. No extra h
 
 Workspace files are included for the Visual Studio Code and Xcode IDEs.
 
+## Release Notes
+
+Please see [CHANGELOG.md](./CHANGELOG.md).
+
 ## Credits
 
-This work was inspired by work done on [KORE Wireless Microvisor FreeRTOS Demo code](https://github.com/korewireless/Microvisor-Demo-CMSIS-Freertos), but the version of the `FreeRTOSConfig.h` file included here was derived from [work by @yunka2](https://github.com/yunkya2/pico-freertos-sample).
+The version of the `FreeRTOSConfig.h` file included here was derived from [work by @yunka2](https://github.com/yunkya2/pico-freertos-sample).
 
 ## Copyright and Licences
 
-Application source © 2024, Tony Smith and licensed under the terms of the [MIT Licence](./LICENSE.md).
+Application source © 2025, Tony Smith and licensed under the terms of the [MIT Licence](./LICENSE.md).
 
 [FreeRTOS](https://freertos.org/) © 2021, Amazon Web Services, Inc. It is also licensed under the terms of the [MIT Licence](./LICENSE.md).
 
-The [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk) is © 2024, Raspberry Pi (Trading) Ltd. It is licensed under the terms of the [BSD 3-Clause "New" or "Revised" Licence](https://github.com/raspberrypi/pico-sdk/blob/master/LICENSE.TXT).
+The [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk) is © 2025, Raspberry Pi (Trading) Ltd. It is licensed under the terms of the [BSD 3-Clause "New" or "Revised" Licence](https://github.com/raspberrypi/pico-sdk/blob/master/LICENSE.TXT).
