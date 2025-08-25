@@ -1,5 +1,7 @@
 ## Release Notes ##
 
+* 1.7.0 *Unreleased*
+    - Update FreeRTOS to 11.0.1.
 * 1.6.0 *25 August 2025*
     * Update for Pico SDK 2.2.0.
 * 1.5.1 *Changes included in 1.6.0*

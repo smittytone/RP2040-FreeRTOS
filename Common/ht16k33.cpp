@@ -3,7 +3,7 @@
  * HT16K33-based I2C 4-digit, 7-segment LED display driver
  *
  * @copyright 2024, Tony Smith (@smittytone)
- * @version   1.5.1
+ * @version   1.7.0
  * @licence   MIT
  *
  */
@@ -184,4 +184,3 @@ void HT16K33_Segment::draw(void) const {
     // Write out the transmit buffer
     I2C::write_block(i2c_addr, tx_buffer, sizeof(tx_buffer));
 }
-

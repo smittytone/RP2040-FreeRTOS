@@ -3,7 +3,7 @@
  * HT16K33-based I2C 4-digit, 7-segment LED display driver
  *
  * @copyright 2024, Tony Smith (@smittytone)
- * @version   1.5.1
+ * @version   1.7.0
  * @licence   MIT
  *
  */

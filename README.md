@@ -1,4 +1,4 @@
-# RP2040-FreeRTOS Template 1.6.0
+# RP2040-FreeRTOS Template 1.7.0
 
 This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
 
