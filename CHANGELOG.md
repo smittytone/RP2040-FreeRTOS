@@ -4,6 +4,7 @@
     - Update FreeRTOS to 11.0.1.
 * 1.6.0 *25 August 2025*
     * Update for Pico SDK 2.2.0.
+    * Fix missing `setup_led()` call from Timers app (thanks, @wolfgangbregel).
 * 1.5.0 *6 August 2024*
     * Correct Timers app.
 * 1.4.2 *7 July 2023*
