@@ -1,7 +1,7 @@
 /**
  * RP2040 FreeRTOS Template
  *
- * @copyright 2024, Tony Smith (@smittytone)
+ * @copyright 2025, Tony Smith (@smittytone)
  * @version   1.5.1
  * @licence   MIT
  *
